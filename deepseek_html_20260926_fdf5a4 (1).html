@@ -1,0 +1,1904 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>親子の進路相談・進路発見ツール</title>
+<style>
+  :root{
+    --bg:#f5f7fb; --card:#fff; --ink:#1f2937; --sub:#6b7280;
+    --line:#e5e7eb; --kid:#2563eb; --kid-bg:#eff6ff;
+    --par:#059669; --par-bg:#ecfdf5; --accent:#7c3aed;
+    --warn:#d97706; --warn-bg:#fffbeb;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.7;}
+  .wrap{max-width:900px;margin:0 auto;padding:24px 16px 80px;}
+  header.app{text-align:center;padding:24px 0 8px;}
+  header.app h1{font-size:22px;margin:0 0 6px;}
+  header.app p{color:var(--sub);font-size:13px;margin:0;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:20px;margin:16px 0;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+  .card h2{font-size:17px;margin:0 0 12px;}
+  .card h3{font-size:15px;margin:18px 0 8px;}
+  .card h4{font-size:14px;margin:14px 0 6px;}
+  button{font-family:inherit;font-size:15px;cursor:pointer;border-radius:10px;
+    border:1px solid var(--line);background:#fff;padding:11px 18px;transition:.15s;color:var(--ink);}
+  button:hover{background:#f9fafb;}
+  button.primary{background:var(--kid);color:#fff;border-color:var(--kid);}
+  button.primary:hover{filter:brightness(1.08);}
+  button.par{background:var(--par);color:#fff;border-color:var(--par);}
+  button.par:hover{filter:brightness(1.08);}
+  button.acc{background:var(--accent);color:#fff;border-color:var(--accent);}
+  button.acc:hover{filter:brightness(1.08);}
+  button.small{font-size:13px;padding:7px 12px;}
+  button:disabled{opacity:.4;cursor:not-allowed;}
+  .role-btns{display:flex;gap:12px;flex-wrap:wrap;}
+  .role-btns button{flex:1;min-width:200px;padding:20px;font-size:16px;font-weight:600;}
+  .role-btns .kid{border:2px solid var(--kid);color:var(--kid);}
+  .role-btns .par{border:2px solid var(--par);color:var(--par);}
+  .role-btns .view{border:2px solid var(--accent);color:var(--accent);}
+  .q{border-top:1px solid var(--line);padding:18px 0;}
+  .q:first-of-type{border-top:none;}
+  .q .qt{font-weight:600;margin-bottom:10px;font-size:15px;}
+  .q .qn{color:var(--sub);font-size:12px;font-weight:400;margin-right:6px;}
+  .opts{display:flex;flex-direction:column;gap:6px;}
+  .opts label{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;
+    border:1px solid var(--line);border-radius:9px;cursor:pointer;font-size:14px;}
+  .opts label:hover{background:#f9fafb;}
+  .opts input{margin-top:5px;}
+  .opts label.sel{background:var(--kid-bg);border-color:var(--kid);}
+  .opts label.sel.par{background:var(--par-bg);border-color:var(--par);}
+  textarea,input[type=text]{width:100%;font-family:inherit;font-size:14px;padding:10px;
+    border:1px solid var(--line);border-radius:9px;resize:vertical;}
+  .priv{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--sub);
+    margin-top:8px;background:var(--warn-bg);padding:8px 12px;border-radius:8px;}
+  .priv.gray{background:#f3f4f6;}
+  .priv input{margin:0;}
+  .progress{height:6px;background:var(--line);border-radius:999px;overflow:hidden;margin-bottom:16px;}
+  .progress>div{height:100%;background:var(--kid);transition:.3s;}
+  .progress.par>div{background:var(--par);}
+  .hidden{display:none;}
+  .note{font-size:13px;color:var(--sub);}
+  table{width:100%;border-collapse:collapse;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+  th{background:#f9fafb;font-weight:600;}
+  .agree{background:#ecfdf5;border-left:4px solid var(--par);padding:10px 14px;border-radius:0 8px 8px 0;margin:8px 0;}
+  .diff{background:#fffbeb;border-left:4px solid var(--warn);padding:10px 14px;border-radius:0 8px 8px 0;margin:8px 0;}
+  .talk{background:#f5f3ff;border-left:4px solid var(--accent);padding:12px 16px;border-radius:0 8px 8px 0;margin:8px 0;font-size:14px;}
+  .theme{background:#fff;border:1px solid #ddd6fe;border-radius:10px;padding:14px 16px;margin:10px 0;}
+  .theme h5{margin:0 0 6px;color:var(--accent);font-size:14px;}
+  .theme p{margin:4px 0;font-size:13px;}
+  .school{border:1px solid var(--line);border-radius:11px;padding:14px;margin:12px 0;}
+  .school.role-main{border-left:5px solid var(--kid);}
+  .school.role-alt{border-left:5px solid var(--par);}
+  .school.role-comp{border-left:5px solid var(--sub);}
+  .school h4{margin:0 0 8px;font-size:15px;}
+  .school .tag{display:inline-block;font-size:12px;background:#f3f4f6;color:#4b5563;padding:2px 9px;border-radius:999px;margin:2px 4px 2px 0;}
+  .role-label{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;margin-bottom:8px;color:#fff;}
+  .role-label.main{background:var(--kid);}
+  .role-label.alt{background:var(--par);}
+  .role-label.comp{background:var(--sub);}
+  .reasons-block{background:#f9fafb;border-radius:8px;padding:10px 12px;margin:8px 0;font-size:13px;}
+  .reasons-block .row{margin:3px 0;}
+  .reasons-block .side{display:inline-block;font-weight:600;min-width:64px;}
+  .reasons-block .side.k{color:var(--kid);}
+  .reasons-block .side.p{color:var(--par);}
+  .reasons-block .side.s{color:var(--accent);}
+  .matched-list{margin:6px 0 0;padding-left:18px;font-size:13px;color:#374151;}
+  .matched-list li{margin:2px 0;}
+  .meta-line{font-size:12px;color:#6b7280;margin-top:6px;font-style:italic;}
+  .footer-nav{display:flex;justify-content:space-between;gap:12px;margin-top:20px;}
+  .footer-nav button{flex:1;}
+  .lead{font-size:14px;color:var(--sub);margin-bottom:14px;}
+  .disclaimer{font-size:12px;color:var(--sub);text-align:center;margin-top:30px;line-height:1.6;}
+  .cond-item{border:1px solid var(--line);border-radius:9px;padding:10px 12px;}
+  .cond-item .cl{font-size:13px;font-weight:600;margin-bottom:6px;}
+  .cond-item .levels{display:flex;flex-wrap:wrap;gap:6px;}
+  .cond-item .levels label{font-size:13px;padding:5px 10px;border:1px solid var(--line);border-radius:8px;cursor:pointer;}
+  .cond-item .levels label.sel{background:var(--kid-bg);border-color:var(--kid);}
+  .cond-item .levels label.sel.par{background:var(--par-bg);border-color:var(--par);}
+  .home-link{position:fixed;right:16px;bottom:16px;background:#fff;border:1px solid var(--line);
+    border-radius:999px;padding:10px 16px;box-shadow:0 2px 8px rgba(0,0,0,.08);font-size:13px;cursor:pointer;z-index:200;}
+  .guide{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;margin:14px 0;}
+  .guide ol{margin:8px 0 0;padding-left:20px;font-size:14px;}
+  .warnbox{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 14px;margin:12px 0;font-size:13px;}
+  .priv-notice{background:#f3f4f6;border:1px dashed #9ca3af;border-radius:10px;padding:12px 14px;margin:10px 0;font-size:13px;color:#4b5563;}
+  .sharebox{background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:14px 16px;margin:14px 0;}
+  .sharebox textarea{font-family:monospace;font-size:11px;line-height:1.4;background:#fff;word-break:break-all;}
+  .sharebox .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .sharebox .row button{flex:1;min-width:120px;}
+  #error-banner{background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;border-radius:10px;
+    padding:12px 14px;margin:12px 0;font-size:13px;display:none;white-space:pre-wrap;}
+  #js-ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;border-radius:10px;
+    padding:8px 12px;margin:12px 0;font-size:12px;display:none;}
+  .role-banner{
+    position:sticky;top:0;z-index:100;padding:12px 16px;text-align:center;
+    font-weight:700;font-size:16px;box-shadow:0 2px 6px rgba(0,0,0,.12);
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    border-radius:12px;margin:0 0 16px;
+  }
+  .role-banner.kid{background:var(--kid);color:#fff;}
+  .role-banner.par{background:var(--par);color:#fff;}
+  .role-banner .icon{font-size:22px;}
+  .role-switch{text-align:center;padding:32px 20px;border-radius:14px;margin:16px 0;}
+  .role-switch.kid{background:var(--kid-bg);border:2px solid var(--kid);}
+  .role-switch.par{background:var(--par-bg);border:2px solid var(--par);}
+  .role-switch .big-icon{font-size:64px;line-height:1;}
+  .role-switch h2{margin:12px 0 8px;font-size:22px;}
+  .role-switch.kid h2{color:var(--kid);}
+  .role-switch.par h2{color:var(--par);}
+  .role-switch p{font-size:14px;margin:6px 0;}
+  .role-switch .who{font-size:20px;font-weight:700;margin:16px 0;padding:14px;border-radius:10px;background:#fff;}
+  .map-intro{font-size:13px;color:var(--sub);margin-bottom:14px;padding:12px 16px;
+    background:#f5f3ff;border-radius:10px;border-left:4px solid var(--accent);}
+  .branch-group{margin:16px 0;padding:14px;background:#fafbfc;border-radius:10px;border:1px solid var(--line);}
+  .branch-group.overseas{background:#fef3c7;border-color:#fcd34d;}
+  .branch-root{margin-bottom:10px;font-weight:600;}
+  .branch-root .lbl{font-size:12px;color:var(--sub);font-weight:400;margin-left:6px;}
+  .branch-line{display:flex;align-items:center;gap:8px;padding:6px 0;padding-left:8px;flex-wrap:wrap;}
+  .branch-connector{color:var(--accent);font-family:monospace;font-size:16px;font-weight:700;flex-shrink:0;}
+  .branch-arrow{color:var(--sub);font-size:12px;}
+  .map-chip{background:var(--kid-bg);color:var(--kid);border:1px solid #bfdbfe;padding:4px 11px;border-radius:999px;font-size:13px;}
+  .map-chip.par{background:var(--par-bg);color:var(--par);border-color:#a7f3d0;}
+  .map-chip.acc{background:#f5f3ff;color:var(--accent);border-color:#ddd6fe;}
+  .map-chip.gray{background:#f3f4f6;color:#4b5563;border-color:#e5e7eb;font-size:12px;}
+  .map-chip.ovs{background:#fef3c7;color:#92400e;border-color:#fcd34d;font-size:12px;}
+  .data-list{max-height:400px;overflow:auto;border:1px solid var(--line);border-radius:10px;margin:12px 0;}
+  .data-list table{font-size:13px;}
+  .data-list th{position:sticky;top:0;background:#f9fafb;z-index:1;}
+  .badge-data{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;
+    background:var(--kid-bg);color:var(--kid);font-weight:600;margin-left:6px;}
+  .term-icon{display:inline-flex;align-items:center;justify-content:center;
+    width:22px;height:22px;border-radius:50%;background:#dbeafe;color:#1d4ed8;
+    font-size:13px;font-weight:700;cursor:pointer;margin-left:6px;vertical-align:middle;
+    user-select:none;line-height:1;flex-shrink:0;border:1px solid #93c5fd;
+    transition:.15s;}
+  .term-icon:hover{background:#93c5fd;color:#fff;transform:scale(1.1);}
+  .term-icon:active{transform:scale(0.95);}
+  .term-popup{position:fixed;background:#1f2937;color:#fff;padding:10px 14px;border-radius:8px;
+    font-size:13px;max-width:280px;z-index:500;box-shadow:0 4px 16px rgba(0,0,0,.2);line-height:1.5;}
+  .term-popup::after{content:'';position:absolute;bottom:-6px;left:20px;
+    border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid #1f2937;}
+  .term-popup strong{color:#fbbf24;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="app">
+  <h1>親子の進路相談・進路発見ツール</h1>
+  <p>どちらが正しいかを決めるのではなく、お互いの考えを理解するためのツールです</p>
+</header>
+
+<div id="js-ok">✅ JavaScriptが動作しています。ボタンが使えます。</div>
+<div id="error-banner"></div>
+
+<div id="screen-home">
+  <div class="card">
+    <h2>はじめに（使い方）</h2>
+    <p class="lead">親と子どもが<strong>別々に</strong>回答し、結果を組み合わせて進路の話し合いをしやすくするツールです。</p>
+    <div class="guide">
+      <strong>📖 使い方の順番</strong>
+      <ol>
+        <li><strong>子ども</strong>が「🧑 子ども用」を押して回答</li>
+        <li>回答後に<strong>共有コード</strong>が出るのでコピー</li>
+        <li>コードを保護者に送る、または同じ端末を保護者に渡す</li>
+        <li><strong>保護者</strong>が「👨‍👩‍👧 保護者用」を押して回答</li>
+        <li>結果が表示されます</li>
+      </ol>
+    </div>
+    <div class="role-btns">
+      <button class="kid" id="btn-kid">🧑 子ども用（回答する）
+        <div style="font-size:12px;font-weight:400;margin-top:6px;color:#6b7280;">押すと回答が始まります</div>
+      </button>
+      <button class="par" id="btn-par">👨‍👩‍👧 保護者用（コード入力）
+        <div style="font-size:12px;font-weight:400;margin-top:6px;color:#6b7280;">子どもの共有コードを貼り付けます</div>
+      </button>
+      <button class="view" id="btn-view">🔍 結果を見る
+        <div style="font-size:12px;font-weight:400;margin-top:6px;color:#6b7280;">結果共有コードを貼り付けます</div>
+      </button>
+    </div>
+  </div>
+  <div class="card" id="saved-area"></div>
+  <div class="card">
+    <h2>⚙️ 学校データの管理</h2>
+    <p class="note">登録されている学校データを確認・追加・書き出しできます。</p>
+    <div class="footer-nav"><button class="small" id="btn-manage-data">データを管理する</button></div>
+  </div>
+</div>
+
+<div id="screen-kid-code" class="hidden">
+  <div class="role-banner kid"><span class="icon">🧑</span>ここからは【子ども】の回答です</div>
+  <div class="card">
+    <p class="lead">保護者の回答を見る前に、あなた自身の考えを回答してください。回答後に共有コードが発行されます。</p>
+    <div class="footer-nav">
+      <button id="btn-kid-back">戻る</button>
+      <button class="primary" id="btn-kid-start">回答をはじめる</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-par-code" class="hidden">
+  <div class="role-banner par"><span class="icon">👨‍👩‍👧</span>ここからは【保護者】の回答です</div>
+  <div class="card">
+    <h2>お子さまから受け取った共有コードを貼り付けてください</h2>
+    <p class="lead">お子さまの回答を見る前に、まずご自身の考えを回答していただきます。</p>
+    <textarea id="par-share-input" rows="6" placeholder="ここに共有コードを貼り付け"></textarea>
+    <p class="note" id="par-code-msg" style="color:#dc2626;"></p>
+    <div class="footer-nav">
+      <button id="btn-par-back">戻る</button>
+      <button class="par" id="btn-par-next">コードを読み込んで次へ</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-view" class="hidden">
+  <div class="role-banner kid"><span class="icon">🔍</span>結果を見る</div>
+  <div class="card">
+    <h2>結果共有コードを貼り付けてください</h2>
+    <p class="lead">保護者の方が発行した結果共有コードを貼り付けると、統合結果を確認できます。</p>
+    <textarea id="view-input" rows="6" placeholder="ここに結果共有コードを貼り付け"></textarea>
+    <p class="note" id="view-msg" style="color:#dc2626;"></p>
+    <div class="footer-nav">
+      <button id="btn-view-back">戻る</button>
+      <button class="acc" id="btn-view-next">結果を表示</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-manage" class="hidden">
+  <div class="card">
+    <h2>⚙️ 学校データの管理</h2>
+    <p class="note">CSVまたはJSONで学校データを読み込めます。</p>
+    <h3>📥 インポート</h3>
+    <div class="warnbox">
+      <strong>CSVの形式（1行目はヘッダー）</strong><br>
+      <code style="font-size:12px;">name,type,area,gender,level,fields,cost,intl,club,dist,note,source,updatedAt</code><br>
+      ・<strong>type</strong>：中学 / 高校 / 大学 / 専門 のいずれか<br>
+      ・<strong>fields</strong>：<code>|</code> で区切り（例：<code>大学進学|国際教育</code>）<br>
+      ・<strong>intl, club</strong>：<code>true</code> / <code>false</code><br>
+      ・<strong>source</strong>：情報源（例：<code>公式サイト 2024-10</code>）<br>
+      ・<strong>updatedAt</strong>：更新日（例：<code>2024-10-01</code>）
+    </div>
+    <textarea id="import-text" rows="8" placeholder="ここにCSVまたはJSONを貼り付けてください"></textarea>
+    <div class="footer-nav">
+      <button class="small" id="btn-load-file">📁 ファイルを選択</button>
+      <button class="primary small" id="btn-import-text">📥 読み込む</button>
+    </div>
+    <input type="file" id="file-input" accept=".csv,.json,.txt" class="hidden">
+    <p class="note" id="import-msg" style="color:#059669;margin-top:8px;"></p>
+    <h3>📤 エクスポート</h3>
+    <div class="footer-nav">
+      <button class="small" id="btn-export-csv">CSVでダウンロード</button>
+      <button class="small" id="btn-copy-csv">CSVをコピー</button>
+    </div>
+    <h3>📋 登録データ <span class="badge-data" id="school-count">0校</span></h3>
+    <div class="data-list" id="school-list"></div>
+    <div class="footer-nav">
+      <button class="small" id="btn-reset-data" style="color:#dc2626;">初期データに戻す</button>
+      <button class="small" id="btn-manage-back">戻る</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-quiz" class="hidden">
+  <div class="role-banner" id="quiz-role-banner"><span class="icon">🧑</span>子どもの回答中</div>
+  <div class="card">
+    <div class="progress" id="quiz-progress"><div style="width:0%"></div></div>
+    <div id="quiz-body"></div>
+  </div>
+</div>
+
+<div id="screen-wait" class="hidden"></div>
+<div id="screen-result" class="hidden"></div>
+
+<div class="disclaimer">
+  このツールは進路を決定するものではありません。分析・情報整理を通じて、<br>
+  親子の話し合いを支援することを目的としています。
+</div>
+
+</div>
+
+<button class="home-link" id="btn-home">🏠 最初に戻る</button>
+
+<script>
+"use strict";
+
+window.onerror = function(msg, url, line){
+  var b = document.getElementById('error-banner');
+  if(b){ b.style.display='block'; b.textContent = '⚠️ エラー：' + msg + '（' + line + '行目）'; }
+};
+
+/* ===== 用語ヘルプ ===== */
+var TERM_HELP = {
+  '普通科':'大学進学を目指す一般的な学科。国語・数学・英語などを幅広く学びます。',
+  '専門学科':'商業・工業・芸術など、特定の分野を専門的に学ぶ学科。',
+  '総合学科':'普通科と専門学科の中間。自分の興味に合わせて科目を選べます。',
+  '通信・単位制':'学年の枠がなく、自分のペースで単位を取って卒業する制度。',
+  '附属・一貫教育':'中学・高校・大学がつながった学校。内部進学の道があることが多い。',
+  '理数教育':'数学・理科を重点的に学ぶ教育課程。',
+  '国際教育':'英語や国際理解を重視した教育課程。留学や海外研修がある学校も。',
+  '推薦・総合型':'学力試験だけでなく、面接や小論文などで合否を決める入試。',
+  '一般入試':'学力試験を中心とした入試。',
+  '大学進学':'高校卒業後、大学へ進学することを目指すコース。',
+  '専門・資格':'資格取得や専門技術を身につけることを重視するコース。',
+  '学力帯':'学校の入試難易度の目安。上位・中堅などで表します。',
+  '共学':'男女が一緒に学ぶ学校。',
+  '別学':'男子校または女子校。',
+  '人文':'文学・哲学・歴史など、人間の文化を学ぶ系統。',
+  '社会':'社会学・心理学など、社会の仕組みを学ぶ系統。',
+  '理':'数学・物理・化学・生物など、自然科学を学ぶ系統。',
+  '工':'機械・電気・情報など、ものづくりを学ぶ系統。',
+  '農':'農業・食品・環境など、自然と食を学ぶ系統。',
+  '医・保健':'医学・看護・リハビリなど、健康を扱う系統。',
+  '芸術':'美術・音楽・デザインなど、表現を学ぶ系統。',
+  '国際':'国際関係・外国語・地域研究など、世界を学ぶ系統。',
+  '少人数':'1クラスの人数が少なく、きめ細かい指導が受けられること。',
+  '少人数教育':'少人数で行う教育。一人ひとりに目が届きやすい。',
+  '専門性':'特定の分野を深く学ぶこと。',
+  '総合性':'複数の分野を幅広く学べること。',
+  '研究環境':'研究設備や教員の質など、学問を深める条件。',
+  '国際性':'国際的な視野や多様性を重視すること。',
+  'インター校への編入':'インターナショナルスクールに転入すること。英語で授業を受けます。',
+  '海外大学への進学':'海外の大学へ進学すること。',
+  '短期の語学留学':'数週間〜数か月の比較的短い期間の語学留学。',
+  '大学での交換留学':'大学の提携校同士で学生を交換する留学制度。',
+  '海外の寮生活（ボーディングスクール）':'海外の全寮制学校で生活しながら学ぶこと。',
+  '高校での留学':'高校在学中に海外の高校へ留学すること。'
+};
+
+function termIcon(text){
+  if(!text || !TERM_HELP[text]) return '';
+  return ' <span class="term-icon" data-term="'+esc(text)+'" title="'+esc(TERM_HELP[text])+'">?</span>';
+}
+
+/* ポップアップ */
+var openTermPopup = null;
+function closePopups(){
+  var popups = document.querySelectorAll('.term-popup');
+  for(var i=0;i<popups.length;i++) popups[i].remove();
+  openTermPopup = null;
+}
+function showTermPopup(icon){
+  var term = icon.getAttribute('data-term');
+  var text = TERM_HELP[term];
+  if(!text) return;
+  closePopups();
+  var pop = document.createElement('div');
+  pop.className = 'term-popup';
+  pop.innerHTML = '<strong>'+esc(term)+'</strong><br>'+esc(text);
+  document.body.appendChild(pop);
+  var rect = icon.getBoundingClientRect();
+  var top = rect.top - pop.offsetHeight - 10;
+  if(top < 10) top = rect.bottom + 10;
+  var left = rect.left;
+  if(left + pop.offsetWidth > window.innerWidth - 10) left = window.innerWidth - pop.offsetWidth - 10;
+  if(left < 10) left = 10;
+  pop.style.top = top + 'px';
+  pop.style.left = left + 'px';
+  openTermPopup = pop;
+}
+/* アイコン以外をクリックしたら閉じる */
+document.addEventListener('click', function(e){
+  if(e.target && e.target.classList && e.target.classList.contains('term-icon')) return;
+  closePopups();
+});
+/* アイコンに直接バインド */
+function bindTermIcons(){
+  var icons = document.querySelectorAll('.term-icon');
+  for(var i=0;i<icons.length;i++){
+    (function(el){
+      if(el._termBound) return;
+      el._termBound = true;
+      el.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        showTermPopup(el);
+      });
+      el.addEventListener('mousedown', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    })(icons[i]);
+  }
+}
+
+/* ===== ストレージ ===== */
+var MEM = {};
+var STORAGE_MODE = (function(){
+  try{ window.localStorage.setItem('__t__','1'); window.localStorage.removeItem('__t__'); return 'local'; }catch(e){}
+  try{ window.sessionStorage.setItem('__t__','1'); window.sessionStorage.removeItem('__t__'); return 'session'; }catch(e){}
+  return 'memory';
+})();
+function loadStore(){
+  try{
+    if(STORAGE_MODE==='local') return JSON.parse(window.localStorage.getItem('shinro_store')||'{}');
+    if(STORAGE_MODE==='session') return JSON.parse(window.sessionStorage.getItem('shinro_store')||'{}');
+  }catch(e){}
+  return MEM;
+}
+function saveStore(s){
+  try{
+    if(STORAGE_MODE==='local'){ window.localStorage.setItem('shinro_store', JSON.stringify(s)); return; }
+    if(STORAGE_MODE==='session'){ window.sessionStorage.setItem('shinro_store', JSON.stringify(s)); return; }
+  }catch(e){}
+  MEM = s;
+}
+
+var SCHOOLS_KEY = 'shinro_schools';
+function loadSchools(){
+  try{
+    var raw = null;
+    if(STORAGE_MODE==='local') raw = window.localStorage.getItem(SCHOOLS_KEY);
+    else if(STORAGE_MODE==='session') raw = window.sessionStorage.getItem(SCHOOLS_KEY);
+    if(raw){
+      var arr = JSON.parse(raw);
+      if(Array.isArray(arr) && arr.length) return arr;
+    }
+  }catch(e){}
+  return null;
+}
+function saveSchools(arr){
+  try{
+    var s = JSON.stringify(arr);
+    if(STORAGE_MODE==='local'){ window.localStorage.setItem(SCHOOLS_KEY, s); return; }
+    if(STORAGE_MODE==='session'){ window.sessionStorage.setItem(SCHOOLS_KEY, s); return; }
+  }catch(e){}
+}
+
+/* ===== Base64 ===== */
+function toB64(str){ try{ return btoa(unescape(encodeURIComponent(str))); }catch(e){ return ''; } }
+function fromB64(s){ try{ return decodeURIComponent(escape(atob(String(s).trim()))); }catch(e){ return ''; } }
+function packData(obj){ return toB64(JSON.stringify(obj)); }
+function unpackData(code){ try{ return JSON.parse(fromB64(code)); }catch(e){ return null; } }
+function cleanAnswersForSharing(a){
+  var c = {};
+  var hasPrivate = false;
+  for(var k in a){
+    if(k.slice(-5) === '_hide'){ continue; }
+    if(a[k+'_hide'] === true){ hasPrivate = true; continue; }
+    var v = a[k];
+    if(v===undefined||v===null||v==='') continue;
+    if(Array.isArray(v)&&v.length===0) continue;
+    c[k]=v;
+  }
+  return { answers: c, hasPrivate: hasPrivate };
+}
+function detectHasPrivate(answers){
+  if(!answers) return false;
+  for(var k in answers){
+    if(k.slice(-5) === '_hide' && answers[k] === true) return true;
+  }
+  return false;
+}
+
+function condValue(ans){
+  if(ans == null) return null;
+  if(typeof ans === 'object' && ans.v) return ans.v;
+  return ans;
+}
+function condLabel(ans){
+  if(ans == null) return null;
+  if(typeof ans === 'object' && ans.l) return ans.l;
+  return String(ans);
+}
+
+/* ===== 基本データ ===== */
+var COURSES = [
+  {id:"jhs", label:"中学校"},
+  {id:"hs", label:"高校"},
+  {id:"univ", label:"大学"},
+  {id:"voc", label:"専門学校・短大など"},
+  {id:"undecided", label:"まだ決まっていない"}
+];
+
+var COMMON_Q = [
+  {id:"c_interest", type:"multi",
+   text:"興味がある分野は？（複数選択可）",
+   parentText:"お子さまが関心を持っていそうな分野は？（複数選択可）",
+   opts:["ものづくり・工学","情報・IT","自然科学","医療・健康","教育","国際・語学","芸術・デザイン","スポーツ","経済・ビジネス","法律・政治","福祉","観光・サービス","農学・環境","心理","まだ分からない"],
+   other:true, priv:true},
+
+  {id:"c_strength", type:"multi",
+   text:"得意なこと・自信があることは？（複数選択可）",
+   parentText:"お子さまの得意なこと・強みだと感じることは？（複数選択可）",
+   opts:["暗記・知識","論理的に考える","文章を書く","人と話す","英語などの語学","手を動かす・作る","数字を扱う","PC・プログラミング","体を動かす","絵・音楽","リーダーシップ","コツコツ続ける","まだ分からない"],
+   other:true, priv:true},
+
+  {id:"c_value", type:"multi",
+   text:"進路を選ぶときに大切にしたいことは？（複数選択可）",
+   parentText:"お子さまの進路で、特に大切にしてほしいことは？（複数選択可）",
+   opts:["安定・安心","収入","自分の好きなこと","人に役立つ","専門性を身につける","挑戦・成長","ワークライフバランス","家族・家からの距離","友人関係","資格が取れる"],
+   other:true, priv:true},
+
+  {id:"c_overseas", type:"multi",
+   text:"海外の学校・留学に興味はありますか？（複数選択可）",
+   parentText:"お子さまに海外経験を積んでほしいとお考えですか？（複数選択可）",
+   opts:["海外大学への進学","高校での留学","短期の語学留学","大学での交換留学","インター校への編入","海外の寮生活（ボーディングスクール）","興味なし"],
+   other:true},
+
+  {id:"c_style", type:"single",
+   text:"学び方の好みは？",
+   parentText:"お子さまに合っていそうな学び方・学ぶ環境は？",
+   opts:["座学中心","実技・実習中心","フィールドワーク","オンライン","どちらでも"]},
+
+  {id:"c_future", type:"single",
+   text:"将来について今の気持ちに近いものは？",
+   parentText:"お子さまの将来について、現在の印象にいちばん近いものは？",
+   opts:["はっきり決めたい","候補を絞りたい","ゆっくり考えたい","まだ分からない"]},
+
+  {id:"c_place", type:"single",
+   text:"通学についての希望は？",
+   parentText:"通学について、どのようにお考えですか？",
+   opts:["自宅から通いたい","一人暮らしも考えたい","どちらでも"]},
+
+  {id:"c_gender_pref", type:"single",
+   text:"通いたい学校の共学・別学について",
+   parentText:"お子さまを通わせたい学校の共学・別学について、近いものは？",
+   opts:["共学がいい","男子校がいい","女子校がいい","どちらでも（こだわらない）"]},
+
+  {id:"c_level_pref", type:"single",
+   text:"希望する学力帯のイメージ",
+   parentText:"お子さまに合いそうな学力帯のイメージは？",
+   opts:["上位校を狙いたい","中堅上位くらい","中堅くらい","こだわらない"]},
+
+  {id:"c_worry", type:"text",
+   text:"進路について、今いちばん気になっていることは？",
+   parentText:"お子さまの進路について、今いちばん気がかりなことは？",
+   priv:true, noAnswer:true},
+
+  {id:"c_dream", type:"text",
+   text:"（子ども）本当はやってみたいこと・まだ親に言っていないこと",
+   kidOnly:true, priv:true, optional:true, noAnswer:true}
+];
+
+var COURSE_Q = {
+  hs: [
+    {id:"hs_type", type:"single", text:"高校で重視したいことは？",
+     parentText:"高校選びで、お子さまに特に重視してほしいことは？",
+     opts:["大学進学","専門・資格","部活動","国際教育","自由な校風","面倒見の良さ","まだ分からない"]},
+    {id:"hs_level", type:"single", text:"学力面の希望は？",
+     parentText:"学力面で、お子さまに合っていそうな挑み方は？",
+     opts:["背伸びして挑戦","実力相応","ゆとりを持って","こだわらない"]},
+    {id:"hs_school", type:"single", text:"学校の種類の希望は？",
+     parentText:"お子さまに合っていそうな学校の種類は？",
+     opts:["普通科","専門学科","総合学科","通信・単位制","こだわらない"]}
+  ],
+  univ: [
+    {id:"u_field", type:"multi", text:"大学で学びたい系統は？（複数可）",
+     parentText:"お子さまが大学で学びそうな系統は？（複数可）",
+     opts:["人文","社会","経済・経営","法学","教育","理","工","農","医・保健","芸術","国際","まだ分からない"], other:true},
+    {id:"u_style", type:"single", text:"大学に求めるものは？",
+     parentText:"お子さまの大学選びで、求めてほしいものは？",
+     opts:["専門性","総合性","研究環境","就職支援","国際性","少人数教育","こだわらない"]},
+    {id:"u_exam", type:"single", text:"入試についての希望は？",
+     parentText:"入試について、お子さまに合っていそうなのは？",
+     opts:["一般入試","推薦・総合型","どちらも視野","まだ分からない"]}
+  ],
+  voc: [
+    {id:"v_field", type:"multi", text:"専門学校・短大で学びたい分野は？（複数可）",
+     parentText:"お子さまが専門学校・短大で学びそうな分野は？（複数可）",
+     opts:["医療","看護","福祉","調理・製菓","美容","IT・ゲーム","デザイン","ビジネス","保育","観光","まだ分からない"], other:true},
+    {id:"v_cert", type:"single", text:"資格取得の希望は？",
+     parentText:"資格取得について、お子さまに望むことは？",
+     opts:["必須","できれば","どちらでも"]},
+    {id:"v_term", type:"single", text:"期間の希望は？",
+     parentText:"通学期間について、お子さまに合っていそうなのは？",
+     opts:["2年","3年","4年","こだわらない"]}
+  ],
+  jhs: [
+    {id:"j_style", type:"single", text:"中学校で力を入れたいことは？",
+     parentText:"お子さまが中学校で力を入れそうなことは？",
+     opts:["勉強","部活動","友人関係","習い事","バランス"]},
+    {id:"j_type", type:"single", text:"中学校に求めるものは？",
+     parentText:"お子さまに合っていそうな中学校のタイプは？",
+     opts:["附属・一貫教育","国際教育","理数教育","スポーツ","少人数","こだわらない"]}
+  ],
+  undecided: [
+    {id:"ud_how", type:"single", text:"進路を考えるときに、まず何から始めたい？",
+     parentText:"お子さまの進路を考えるとき、まず何から始めたいですか？",
+     opts:["興味を探す","得意を伸ばす","職業を知る","学校を見る","人に相談する"]},
+    {id:"ud_time", type:"single", text:"いつごろまでに方向性を決めたい？",
+     parentText:"お子さまの進路の方向性は、いつごろまでに固まればよいとお考えですか？",
+     opts:["3か月以内","半年以内","1年以内","決めなくてよい"]}
+  ]
+};
+
+/* 保護者専用質問：重複していた p_child_fit / p_hope / p_distance を削除 */
+var PARENT_Q = [
+  {id:"p_child_str", type:"text",
+   text:"お子さまの良いところ・伸ばしてほしいところは？", noAnswer:true},
+  {id:"p_worry", type:"text",
+   text:"進路について心配していることは？", noAnswer:true},
+  {id:"p_cost", type:"single",
+   text:"費用についての考えは？",
+   opts:["国公立中心","私立も可","奨学金も視野","こだわらない"]}
+];
+
+var CONDITION_ITEMS = [
+  {id:"cond_distance", label:"通学時間",
+   levels:[
+     {v:"must", l:"30分以内が絶対条件"},
+     {v:"want", l:"1時間以内が望ましい"},
+     {v:"any",  l:"こだわらない"},
+     {v:"avoid",l:"1時間以上は避けたい"}
+   ]},
+  {id:"cond_cost", label:"学費",
+   levels:[
+     {v:"must", l:"学費が安い学校が絶対条件"},
+     {v:"want", l:"できれば学費を抑えたい"},
+     {v:"any",  l:"こだわらない"},
+     {v:"avoid",l:"学費が高い学校は避けたい"}
+   ]},
+  {id:"cond_level", label:"学力帯",
+   levels:[
+     {v:"must", l:"実力に合った学力帯が絶対条件"},
+     {v:"want", l:"できれば実力相応がよい"},
+     {v:"any",  l:"こだわらない"},
+     {v:"avoid",l:"レベルが高すぎる学校は避けたい"}
+   ]},
+  {id:"cond_gender", label:"共学・別学",
+   levels:[
+     {v:"must", l:"共学が絶対条件"},
+     {v:"want", l:"できれば共学がよい"},
+     {v:"any",  l:"こだわらない"},
+     {v:"avoid",l:"別学は避けたい"}
+   ]},
+  {id:"cond_club", label:"部活動",
+   levels:[
+     {v:"must", l:"部活動があることが絶対条件"},
+     {v:"want", l:"できれば部活動を続けたい"},
+     {v:"any",  l:"こだわらない"},
+     {v:"avoid",l:"部活動はしたくない"}
+   ]},
+  {id:"cond_intl", label:"国際教育",
+   levels:[
+     {v:"must", l:"国際教育が絶対条件"},
+     {v:"want", l:"できれば国際教育があるとよい"},
+     {v:"any",  l:"こだわらない"},
+     {v:"avoid",l:"国際教育は不要"}
+   ]}
+];
+
+var INTEREST_TO_FEATURES = {
+  "ものづくり・工学": ["工学","ものづくり","機械","電気","ロボット","理数"],
+  "情報・IT":        ["情報","IT","工学","プログラミング","理数","データ"],
+  "自然科学":        ["理学","科学","理数","自然科学"],
+  "医療・健康":      ["医療","看護","福祉","保健","薬学","健康"],
+  "教育":            ["教育","教員","保育","大学進学"],
+  "国際・語学":      ["国際教育","国際","英語","語学","留学","海外"],
+  "芸術・デザイン":  ["芸術","デザイン","美術","音楽","クリエイティブ","映像"],
+  "スポーツ":        ["スポーツ","体育","運動","部活動"],
+  "経済・ビジネス":  ["経済","ビジネス","経営","商業","マーケティング"],
+  "法律・政治":      ["法律","政治","法","社会科学"],
+  "福祉":            ["福祉","介護","社会福祉","医療"],
+  "観光・サービス":  ["観光","サービス","ホスピタリティ","国際"],
+  "農学・環境":      ["農学","環境","科学","理数"],
+  "心理":            ["心理","社会科学","人文"]
+};
+
+var COURSE_Q_TO_FEATURES = {
+  j_type: {'附属・一貫教育':['大学進学','附属','一貫'],'国際教育':['国際教育','国際','英語'],'理数教育':['理数','科学'],'スポーツ':['スポーツ','体育'],'少人数':['少人数']},
+  hs_type: {'大学進学':['大学進学'],'専門・資格':['専門・資格','商業'],'部活動':['部活動'],'国際教育':['国際教育','国際','英語']},
+  hs_school: {'普通科':['大学進学'],'専門学科':['専門・資格','商業'],'総合学科':['総合'],'通信・単位制':['通信','単位制']},
+  u_field: {'人文':['人文'],'社会':['社会'],'経済・経営':['経済','経営'],'法学':['法'],'教育':['教育'],'理':['理'],'工':['工'],'農':['農'],'医・保健':['医','保健','看護'],'芸術':['芸術'],'国際':['国際']},
+  u_style: {'専門性':['専門'],'総合性':['総合'],'国際性':['国際'],'少人数教育':['少人数']},
+  v_field: {'医療':['医療'],'看護':['看護'],'福祉':['福祉'],'調理・製菓':['調理','製菓'],'美容':['美容'],'IT・ゲーム':['IT','ゲーム'],'デザイン':['デザイン'],'ビジネス':['ビジネス'],'保育':['保育'],'観光':['観光']},
+  j_style: {'勉強':['大学進学'],'部活動':['部活動'],'友人関係':[],'習い事':[],'バランス':[]}
+};
+
+var OVERSEAS_TO_FEATURES = {
+  '海外大学への進学':     ['海外大学','留学','国際','英語','海外'],
+  '高校での留学':         ['留学','海外研修','国際','英語','海外'],
+  '短期の語学留学':       ['留学','語学','英語','海外'],
+  '大学での交換留学':     ['交換留学','留学','国際','海外'],
+  'インター校への編入':   ['インター校','国際','英語'],
+  '海外の寮生活（ボーディングスクール）':['ボーディングスクール','留学','海外']
+};
+
+var BRANCH_MAP = {
+  "ものづくり・工学":[{field:"機械工学",jobs:["設計技術者","研究開発","自動車関連"]},{field:"電気電子工学",jobs:["エンジニア","通信","半導体"]},{field:"ロボット工学",jobs:["研究開発","システム設計","AI"]}],
+  "情報・IT":[{field:"情報工学",jobs:["エンジニア","SE","インフラ"]},{field:"データサイエンス",jobs:["データ分析","AI開発","研究者"]},{field:"経営情報学",jobs:["ITコンサル","企画","起業"]}],
+  "自然科学":[{field:"理学",jobs:["研究職","大学教員","技術職"]},{field:"化学",jobs:["製薬","素材メーカー","研究開発"]},{field:"生物学",jobs:["研究職","食品","環境"]}],
+  "医療・健康":[{field:"医学",jobs:["医師","研究者","医療機関"]},{field:"看護学",jobs:["看護師","保健師","助産師"]},{field:"リハビリ",jobs:["理学療法士","作業療法士","スポーツ現場"]}],
+  "教育":[{field:"教育学",jobs:["教員","教育支援","研究者"]},{field:"教員養成",jobs:["小中高教員","特別支援","塾講師"]}],
+  "国際・語学":[{field:"国際関係",jobs:["国際ビジネス","外交官","国際協力"]},{field:"外国語",jobs:["通訳","翻訳","語学教員"]},{field:"観光学",jobs:["観光・ホテル","旅行業","観光企画"]}],
+  "芸術・デザイン":[{field:"美術",jobs:["美術家","教員","学芸員"]},{field:"デザイン",jobs:["グラフィック","Web","UI/UX"]},{field:"映像",jobs:["映像制作","アニメ","広告"]}],
+  "スポーツ":[{field:"体育学",jobs:["体育教員","指導者","研究者"]},{field:"スポーツ科学",jobs:["トレーナー","アスリート支援","健康産業"]}],
+  "経済・ビジネス":[{field:"経済学",jobs:["金融","研究","公務員"]},{field:"経営学",jobs:["マーケティング","企画","起業"]},{field:"商学",jobs:["会計","商業","貿易"]}],
+  "法律・政治":[{field:"法学",jobs:["法律家","企業法務","公務員"]},{field:"政治学",jobs:["公務員","政策企画","ジャーナリズム"]}],
+  "福祉":[{field:"社会福祉学",jobs:["ソーシャルワーカー","行政","施設運営"]},{field:"介護福祉",jobs:["介護職","ケアマネ","施設職員"]}],
+  "観光・サービス":[{field:"観光学",jobs:["旅行業","観光企画","地域活性"]},{field:"ホスピタリティ",jobs:["ホテル","ブライダル","サービス業"]}],
+  "農学・環境":[{field:"農学",jobs:["研究職","食品","農業"]},{field:"環境科学",jobs:["環境保全","行政","研究職"]}],
+  "心理":[{field:"心理学",jobs:["カウンセラー","研究","人事"]}]
+};
+
+var OVERSEAS_BRANCH = [
+  {field:"海外大学",           jobs:["海外大卒業→国際企業","研究者","現地就職"]},
+  {field:"高校留学",           jobs:["現地の高校卒業","大学進学","国際感覚を養う"]},
+  {field:"短期語学留学",       jobs:["語学力アップ","国際交流","大学準備"]},
+  {field:"大学交換留学",       jobs:["1年留学","国際経験","現地ネットワーク"]},
+  {field:"インター校編入",     jobs:["英語での学び","海外大学への準備","国際バカロレア"]}
+];
+
+var DEFAULT_SCHOOLS = [
+  {name:"横浜インターナショナルスクール", type:"高校", area:"横浜", gender:"共学", level:"-", fields:["インター校","国際","英語","海外大学","留学"], cost:"高", intl:true, club:false, dist:"横浜駅から25分", note:"英語で教育を行うインターナショナルスクール。国際バカロレア等。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"セント・モア・インターナショナルスクール", type:"高校", area:"横浜", gender:"共学", level:"-", fields:["インター校","国際","英語","海外大学"], cost:"高", intl:true, club:false, dist:"横浜駅から15分", note:"カトリック系のインターナショナルスクール。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+
+  {name:"横浜雙葉中学校", type:"中学", area:"横浜", gender:"女子", level:"上位", fields:["大学進学","英語","国際"], cost:"高", intl:true, club:true, dist:"横浜駅から20分", note:"カトリック系女子校。英語教育に力。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"フェリス女学院中学校", type:"中学", area:"横浜", gender:"女子", level:"上位", fields:["大学進学","英語","国際","留学"], cost:"高", intl:true, club:true, dist:"横浜駅から30分", note:"伝統ある女子校。国際教育に特色。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"浅野中学校", type:"中学", area:"横浜", gender:"男子", level:"最上位", fields:["大学進学"], cost:"高", intl:false, club:true, dist:"横浜駅から25分", note:"首都圏有数の男子進学校。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"栄光学園中学校", type:"中学", area:"鎌倉", gender:"男子", level:"最上位", fields:["大学進学"], cost:"高", intl:false, club:true, dist:"大船駅から20分", note:"難関大進学に強い。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"聖光学院中学校", type:"中学", area:"横浜", gender:"男子", level:"最上位", fields:["大学進学"], cost:"高", intl:false, club:true, dist:"横浜駅から20分", note:"難関大進学で知られる。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"サレジオ学院中学校", type:"中学", area:"横浜", gender:"男子", level:"上位", fields:["大学進学"], cost:"高", intl:false, club:true, dist:"横浜駅から30分", note:"カトリック系男子校。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"桐光学園中学校", type:"中学", area:"川崎", gender:"共学", level:"上位", fields:["大学進学","スポーツ"], cost:"高", intl:false, club:true, dist:"登戸駅から20分", note:"進学とスポーツ。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"洗足学園中学校", type:"中学", area:"川崎", gender:"女子", level:"上位", fields:["大学進学","音楽"], cost:"高", intl:false, club:true, dist:"溝の口駅から15分", note:"音楽教育でも知られる。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"公文国際学園中等部", type:"中学", area:"横浜", gender:"共学", level:"中堅上位", fields:["国際教育","国際","英語","留学","大学進学"], cost:"高", intl:true, club:true, dist:"横浜駅から40分", note:"国際教育に特色。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"慶應義塾湘南藤沢中等部", type:"中学", area:"藤沢", gender:"共学", level:"最上位", fields:["大学進学","国際","海外大学"], cost:"高", intl:true, club:true, dist:"湘南台駅から20分", note:"慶應大学への内部進学あり。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"横浜市立横浜サイエンスフロンティア中学校", type:"中学", area:"横浜", gender:"共学", level:"上位", fields:["理数","科学","大学進学"], cost:"低", intl:false, club:true, dist:"横浜駅から40分", note:"理数教育に特化した市立中高一貫校。", source:"横浜市教育委員会 2024-10", updatedAt:"2024-10-01"},
+  {name:"神奈川大学附属中学校", type:"中学", area:"横浜", gender:"共学", level:"中堅上位", fields:["大学進学","工学","情報"], cost:"中", intl:false, club:true, dist:"横浜駅から30分", note:"神奈川大学への内部進学あり。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"日本大学中学校", type:"中学", area:"横浜", gender:"男子", level:"中堅", fields:["大学進学"], cost:"高", intl:false, club:true, dist:"横浜駅から40分", note:"日大への内部進学あり。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"法政大学第二中学校", type:"中学", area:"川崎", gender:"男子", level:"上位", fields:["大学進学"], cost:"高", intl:false, club:true, dist:"武蔵小杉駅から15分", note:"法政大学への内部進学あり。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+
+  {name:"横浜翠嵐高校", type:"高校", area:"横浜", gender:"共学", level:"最上位", fields:["大学進学"], cost:"低", intl:false, club:true, dist:"横浜駅から30分", note:"県内トップクラスの進学校。", source:"神奈川県教育委員会 2024-10", updatedAt:"2024-10-01"},
+  {name:"柏陽高校", type:"高校", area:"横浜", gender:"共学", level:"上位", fields:["大学進学"], cost:"低", intl:false, club:true, dist:"横浜駅から25分", note:"進学指導に定評。", source:"神奈川県教育委員会 2024-10", updatedAt:"2024-10-01"},
+  {name:"川和高校", type:"高校", area:"横浜", gender:"共学", level:"上位", fields:["大学進学"], cost:"低", intl:false, club:true, dist:"横浜駅から40分", note:"文武両道。", source:"神奈川県教育委員会 2024-10", updatedAt:"2024-10-01"},
+  {name:"湘南高校", type:"高校", area:"藤沢", gender:"共学", level:"最上位", fields:["大学進学"], cost:"低", intl:false, club:true, dist:"藤沢駅から20分", note:"県内トップクラス。", source:"神奈川県教育委員会 2024-10", updatedAt:"2024-10-01"},
+  {name:"厚木高校", type:"高校", area:"厚木", gender:"共学", level:"上位", fields:["大学進学"], cost:"低", intl:false, club:true, dist:"本厚木駅から20分", note:"県央の進学校。", source:"神奈川県教育委員会 2024-10", updatedAt:"2024-10-01"},
+  {name:"多摩高校", type:"高校", area:"川崎", gender:"共学", level:"上位", fields:["大学進学"], cost:"低", intl:false, club:true, dist:"川崎駅から40分", note:"進学指導に定評。", source:"神奈川県教育委員会 2024-10", updatedAt:"2024-10-01"},
+  {name:"横浜平沼高校", type:"高校", area:"横浜", gender:"共学", level:"中堅", fields:["大学進学"], cost:"低", intl:false, club:true, dist:"横浜駅から10分", note:"横浜駅に近い。", source:"神奈川県教育委員会 2024-10", updatedAt:"2024-10-01"},
+  {name:"横浜商業高校", type:"高校", area:"横浜", gender:"共学", level:"中堅", fields:["専門・資格","商業","経済"], cost:"低", intl:false, club:true, dist:"横浜駅から15分", note:"商業科・国際学科。", source:"神奈川県教育委員会 2024-10", updatedAt:"2024-10-01"},
+  {name:"横浜市立横浜サイエンスフロンティア高校", type:"高校", area:"横浜", gender:"共学", level:"上位", fields:["理数","科学","大学進学"], cost:"低", intl:false, club:true, dist:"横浜駅から40分", note:"理数教育に特化。", source:"横浜市教育委員会 2024-10", updatedAt:"2024-10-01"},
+  {name:"浅野高校", type:"高校", area:"横浜", gender:"男子", level:"最上位", fields:["大学進学"], cost:"高", intl:false, club:true, dist:"横浜駅から25分", note:"首都圏有数の男子進学校。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"栄光学園高校", type:"高校", area:"鎌倉", gender:"男子", level:"最上位", fields:["大学進学"], cost:"高", intl:false, club:true, dist:"大船駅から20分", note:"難関大進学に強い。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"聖光学院高校", type:"高校", area:"横浜", gender:"男子", level:"最上位", fields:["大学進学","海外大学","留学"], cost:"高", intl:true, club:true, dist:"横浜駅から20分", note:"難関大進学で知られる。海外大学進学実績あり。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"桐光学園高校", type:"高校", area:"川崎", gender:"共学", level:"上位", fields:["大学進学","スポーツ"], cost:"高", intl:false, club:true, dist:"登戸駅から20分", note:"進学とスポーツ。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"洗足学園高校", type:"高校", area:"川崎", gender:"女子", level:"上位", fields:["大学進学","音楽","芸術"], cost:"高", intl:false, club:true, dist:"溝の口駅から15分", note:"音楽教育でも知られる。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"フェリス女学院高校", type:"高校", area:"横浜", gender:"女子", level:"上位", fields:["大学進学","英語","国際教育","留学"], cost:"高", intl:true, club:true, dist:"横浜駅から30分", note:"英語教育に力。留学プログラムあり。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"公文国際学園高校", type:"高校", area:"横浜", gender:"共学", level:"中堅上位", fields:["国際教育","国際","英語","海外大学","留学","大学進学"], cost:"高", intl:true, club:true, dist:"横浜駅から40分", note:"国際教育に特色。海外大学進学も。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"慶應義塾湘南藤沢高校", type:"高校", area:"藤沢", gender:"共学", level:"最上位", fields:["大学進学","国際教育","国際","海外大学","留学","交換留学"], cost:"高", intl:true, club:true, dist:"湘南台駅から20分", note:"慶應大学への内部進学あり。海外プログラムも充実。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"桐蔭学園高校", type:"高校", area:"横浜", gender:"共学", level:"上位", fields:["大学進学","スポーツ"], cost:"高", intl:false, club:true, dist:"横浜駅から40分", note:"進学とスポーツ。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"法政大学第二高校", type:"高校", area:"川崎", gender:"男子", level:"上位", fields:["大学進学"], cost:"高", intl:false, club:true, dist:"武蔵小杉駅から15分", note:"法政大学への内部進学あり。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+
+  {name:"横浜国立大学", type:"大学", area:"横浜", gender:"共学", level:"上位", fields:["教育","経済","工学","留学"], cost:"低", intl:true, club:true, dist:"横浜駅から30分", note:"国公立。留学プログラムあり。", source:"大学公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"横浜市立大学", type:"大学", area:"横浜", gender:"共学", level:"上位", fields:["国際","医学","データ","留学","交換留学"], cost:"低", intl:true, club:true, dist:"横浜駅から20分", note:"市立。国際系に強い。", source:"大学公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"神奈川大学", type:"大学", area:"横浜", gender:"共学", level:"中堅", fields:["総合","工学","経済"], cost:"中", intl:false, club:true, dist:"横浜駅から20分", note:"総合大学。", source:"大学公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"関東学院大学", type:"大学", area:"横浜", gender:"共学", level:"中堅", fields:["総合","工学","教育"], cost:"中", intl:false, club:true, dist:"横浜駅から30分", note:"キリスト教系。", source:"大学公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"東海大学 湘南キャンパス", type:"大学", area:"平塚", gender:"共学", level:"中堅", fields:["総合","工学","スポーツ","留学"], cost:"中", intl:true, club:true, dist:"平塚駅から20分", note:"総合大学。海外協定校多数。", source:"大学公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"神奈川工科大学", type:"大学", area:"厚木", gender:"共学", level:"中堅", fields:["工学","情報"], cost:"中", intl:false, club:true, dist:"本厚木駅から20分", note:"工学・情報系。", source:"大学公式サイト 2024-10", updatedAt:"2024-10-01"},
+
+  {name:"横浜デジタルアーツ専門学校", type:"専門", area:"横浜", gender:"共学", level:"-", fields:["デザイン","IT","ゲーム"], cost:"中", intl:false, club:false, dist:"横浜駅から10分", note:"クリエイティブ系。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"},
+  {name:"日本工学院専門学校", type:"専門", area:"川崎", gender:"共学", level:"-", fields:["IT","デザイン","ゲーム","音響"], cost:"中", intl:false, club:false, dist:"川崎駅から30分", note:"分野が幅広い。", source:"学校公式サイト 2024-10", updatedAt:"2024-10-01"}
+];
+
+var SCHOOLS = loadSchools() || DEFAULT_SCHOOLS;
+
+/* ===== 状態 ===== */
+var state = { role:null, code:null, answers:{}, qIndex:0, questions:[], course:null, lastShareCode:'' };
+
+function genCode(){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789', c='';
+  for(var i=0;i<6;i++) c+=chars[Math.floor(Math.random()*chars.length)];
+  return c;
+}
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];}); }
+
+function show(id){
+  closePopups();
+  var ids=['screen-home','screen-kid-code','screen-par-code','screen-view','screen-manage','screen-quiz','screen-wait','screen-result'];
+  for(var i=0;i<ids.length;i++) $(ids[i]).classList.add('hidden');
+  $(id).classList.remove('hidden');
+  window.scrollTo(0,0);
+}
+function goHome(){ renderSaved(); show('screen-home'); }
+
+function renderSaved(){
+  var store = loadStore();
+  var area = $('saved-area');
+  var html = '<h2>この端末の保存データ</h2>';
+  var found = false;
+  for(var code in store){
+    found = true;
+    var d = store[code];
+    var parts = [];
+    if(d.kid && d.parent) parts.push('統合結果あり');
+    else if(d.kid) parts.push('子ども回答あり');
+    else if(d.parent) parts.push('保護者回答あり');
+    html += '<div style="padding:8px 0;border-bottom:1px solid var(--line);">'
+      + '<strong>'+esc(code)+'</strong>　'+esc(parts.join('・'))+'　'
+      + '<button data-resume="'+esc(code)+'" style="padding:4px 10px;font-size:13px;">開く</button></div>';
+  }
+  if(!found) html += '<p class="note">まだデータはありません。</p>';
+  area.innerHTML = html;
+  var btns = area.querySelectorAll('[data-resume]');
+  for(var i=0;i<btns.length;i++){
+    (function(b){ b.addEventListener('click', function(){ resumeCode(b.getAttribute('data-resume')); }); })(btns[i]);
+  }
+}
+
+function resumeCode(code){
+  var store = loadStore(), d = store[code];
+  if(!d) return;
+  state.code = code;
+  state.course = d.course||null;
+  if(d.kid && d.parent){ showResult(code); return; }
+  if(d.kid){ state.role='kid'; state.answers = d.kidAnswers||{}; showWait('kid'); return; }
+  if(d.parent){ state.role='parent'; state.answers = d.parentAnswers||{}; showWait('parent'); return; }
+}
+
+/* ===== 学校データ管理 ===== */
+function showManage(){
+  renderSchoolList();
+  $('import-msg').textContent = '';
+  $('import-text').value = '';
+  show('screen-manage');
+}
+function renderSchoolList(){
+  var list = $('school-list');
+  $('school-count').textContent = SCHOOLS.length + '校';
+  var html = '<table><thead><tr><th>学校名</th><th>種別</th><th>地域</th><th>共学/別学</th><th>学力帯</th><th>更新日</th></tr></thead><tbody>';
+  SCHOOLS.forEach(function(s){
+    html += '<tr><td>'+esc(s.name)+'</td><td>'+esc(s.type||'')+'</td><td>'+esc(s.area||'')+'</td><td>'+esc(s.gender||'')+'</td><td>'+esc(s.level||'')+'</td><td>'+esc(s.updatedAt||'')+'</td></tr>';
+  });
+  html += '</tbody></table>';
+  list.innerHTML = html;
+}
+function parseCSV(text){
+  var lines = text.split(/\r?\n/).filter(function(l){return l.trim();});
+  if(lines.length<2) return [];
+  var headers = splitCSVLine(lines[0]);
+  var out = [];
+  for(var i=1;i<lines.length;i++){
+    var cells = splitCSVLine(lines[i]);
+    var obj = {};
+    headers.forEach(function(h,idx){ obj[h.trim()] = (cells[idx]||'').trim(); });
+    if(!obj.name) continue;
+    var fields = [];
+    if(obj.fields){ fields = obj.fields.split(/[|;]/).map(function(s){return s.trim();}).filter(Boolean); }
+    out.push({
+      name: obj.name, type: obj.type||'高校', area: obj.area||'', gender: obj.gender||'共学',
+      level: obj.level||'', fields: fields, cost: obj.cost||'中',
+      intl: /true|1|yes|はい/i.test(obj.intl||''),
+      club: /true|1|yes|はい/i.test(obj.club||''),
+      dist: obj.dist||'', note: obj.note||'',
+      source: obj.source||'', updatedAt: obj.updatedAt||''
+    });
+  }
+  return out;
+}
+function splitCSVLine(line){
+  var res = [], cur = '', inQ = false;
+  for(var i=0;i<line.length;i++){
+    var ch = line[i];
+    if(inQ){
+      if(ch==='"'){ if(line[i+1]==='"'){ cur+='"'; i++; } else inQ = false; }
+      else cur += ch;
+    } else {
+      if(ch==='"') inQ = true;
+      else if(ch===','){ res.push(cur); cur=''; }
+      else cur += ch;
+    }
+  }
+  res.push(cur);
+  return res;
+}
+function importText(){
+  var text = $('import-text').value.trim();
+  if(!text){ $('import-msg').style.color='#dc2626'; $('import-msg').textContent='データが空です。'; return; }
+  var arr = [];
+  try{
+    if(text[0]==='[' || text[0]==='{'){
+      var parsed = JSON.parse(text);
+      arr = Array.isArray(parsed) ? parsed : (parsed.schools||[]);
+    } else { arr = parseCSV(text); }
+  }catch(e){
+    $('import-msg').style.color='#dc2626';
+    $('import-msg').textContent = '読み込みに失敗：'+e.message;
+    return;
+  }
+  if(!arr.length){ $('import-msg').style.color='#dc2626'; $('import-msg').textContent='有効なデータがありません。'; return; }
+  SCHOOLS = arr;
+  saveSchools(SCHOOLS);
+  renderSchoolList();
+  $('import-msg').style.color='#059669';
+  $('import-msg').textContent = '✅ '+arr.length+'校を読み込みました。';
+}
+function exportCSV(){
+  var headers = ['name','type','area','gender','level','fields','cost','intl','club','dist','note','source','updatedAt'];
+  var lines = [headers.join(',')];
+  SCHOOLS.forEach(function(s){
+    var row = [
+      csvCell(s.name), csvCell(s.type), csvCell(s.area), csvCell(s.gender),
+      csvCell(s.level), csvCell((s.fields||[]).join('|')), csvCell(s.cost),
+      s.intl?'true':'false', s.club?'true':'false',
+      csvCell(s.dist), csvCell(s.note), csvCell(s.source||''), csvCell(s.updatedAt||'')
+    ];
+    lines.push(row.join(','));
+  });
+  return lines.join('\n');
+}
+function csvCell(v){
+  v = (v==null?'':String(v));
+  if(v.indexOf(',')>=0 || v.indexOf('"')>=0 || v.indexOf('\n')>=0){ return '"'+v.replace(/"/g,'""')+'"'; }
+  return v;
+}
+function downloadCSV(){
+  var csv = exportCSV();
+  var blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'schools.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function copyCSV(){
+  var csv = exportCSV();
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(csv).then(function(){
+      $('import-msg').style.color='#059669';
+      $('import-msg').textContent='✅ CSVをコピーしました。';
+    });
+  }
+}
+function loadFile(){ $('file-input').click(); }
+function onFileSelected(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    $('import-text').value = ev.target.result;
+    $('import-msg').style.color='#6b7280';
+    $('import-msg').textContent='ファイルを読み込みました。「読み込む」を押してください。';
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+function resetSchools(){
+  if(!confirm('初期データに戻しますか？現在のデータは失われます。')) return;
+  SCHOOLS = DEFAULT_SCHOOLS.slice();
+  saveSchools(SCHOOLS);
+  renderSchoolList();
+  $('import-msg').style.color='#059669';
+  $('import-msg').textContent='✅ 初期データに戻しました。';
+}
+
+/* ===== 開始 ===== */
+function startKid(){
+  state.role='kid';
+  state.code = genCode();
+  state.answers = {};
+  state.course = null;
+  state.qIndex = 0;
+  var store = loadStore();
+  store[state.code] = {kid:false, parent:false};
+  saveStore(store);
+  show('screen-kid-code');
+}
+function showParentCode(){
+  state.role='parent';
+  $('par-share-input').value = '';
+  $('par-code-msg').textContent = '';
+  show('screen-par-code');
+}
+function checkParCode(){
+  var raw = $('par-share-input').value.trim();
+  if(!raw){ $('par-code-msg').textContent = '共有コードを貼り付けてください。'; return; }
+  var data = unpackData(raw);
+  if(!data || !data.k){ $('par-code-msg').textContent = 'コードを読み込めませんでした。'; return; }
+  var code = genCode();
+  var store = loadStore();
+  store[code] = { kid:true, kidAnswers:data.k, kidHasPrivate: data.hp||false, course:data.c||'undecided', parent:false };
+  saveStore(store);
+  state.code = code;
+  state.course = data.c||null;
+  state.answers = {};
+  state.qIndex = 0;
+  beginQuestions('parent');
+}
+function showView(){
+  $('view-input').value = '';
+  $('view-msg').textContent = '';
+  show('screen-view');
+}
+function checkViewCode(){
+  var raw = $('view-input').value.trim();
+  if(!raw){ $('view-msg').textContent = '結果共有コードを貼り付けてください。'; return; }
+  var data = unpackData(raw);
+  if(!data || data.t!=='r'){ $('view-msg').textContent = '結果共有コードを読み込めませんでした。'; return; }
+  var code = genCode();
+  var store = loadStore();
+  store[code] = {
+    kid:true, kidAnswers:data.k, kidHasPrivate:data.hp||false,
+    parent:true, parentAnswers:data.p, course:data.c||'undecided'
+  };
+  saveStore(store);
+  showResult(code);
+}
+
+/* ===== 質問 ===== */
+function beginQuestions(role){
+  state.role = role;
+  state.qIndex = 0;
+  state.answers = {};
+  state.questions = buildQuestions(state.course);
+  renderQuiz();
+  show('screen-quiz');
+}
+function buildQuestions(courseId){
+  var qs = [];
+  qs.push({
+    id:"__course__", type:"single",
+    text:"現在、どの進路を考えていますか？",
+    parentText:"お子さまが今、進路として考えているのは？",
+    opts: COURSES.map(function(c){return c.label;}),
+    isCourse:true
+  });
+  COMMON_Q.forEach(function(q){ if(q.kidOnly && state.role!=='kid') return; qs.push(q); });
+  if(state.role==='parent') PARENT_Q.forEach(function(q){ qs.push(q); });
+  if(courseId) (COURSE_Q[courseId]||[]).forEach(function(q){ qs.push(q); });
+  qs.push({
+    id:"__cond__", type:"condblock",
+    text:"進路を選ぶときの「条件の強さ」を教えてください",
+    parentText:"お子さまの進路選びで、以下の条件をどのくらい重視しますか？"
+  });
+  qs.push({
+    id:"c_free", type:"text",
+    text:"その他、進路について伝えたいことがあれば自由に書いてください。",
+    parentText:"その他、お子さまの進路について伝えたいことがあれば自由に書いてください。",
+    priv:true, optional:true, noAnswer:true
+  });
+  return qs;
+}
+function qText(q){
+  if(state.role==='parent' && q.parentText) return q.parentText;
+  return q.text;
+}
+function renderQuiz(){
+  var isPar = state.role==='parent';
+  var rb = $('quiz-role-banner');
+  rb.className = 'role-banner ' + (isPar?'par':'kid');
+  rb.innerHTML = '<span class="icon">'+(isPar?'👨‍👩‍👧':'🧑')+'</span>'
+    + (isPar ? '【保護者】の回答中です' : '【子ども】の回答中です');
+  var prog = $('quiz-progress');
+  prog.className = 'progress'+(isPar?' par':'');
+  var q = state.questions[state.qIndex];
+  var total = state.questions.length;
+  prog.firstElementChild.style.width = ((state.qIndex)/total*100)+'%';
+  var body = $('quiz-body');
+  var html = '';
+
+  if(q.type==='condblock'){
+    html += '<div class="q"><div class="qt"><span class="qn">Q'+(state.qIndex+1)+' / '+total+'</span>'+esc(qText(q))+'</div><div style="display:flex;flex-direction:column;gap:8px;">';
+    CONDITION_ITEMS.forEach(function(c){
+      var cur = condValue(state.answers[c.id]);
+      html += '<div class="cond-item"><div class="cl">'+esc(c.label)+'</div><div class="levels">';
+      c.levels.forEach(function(lv){
+        var sel = cur===lv.v?' sel'+(isPar?' par':''):'';
+        html += '<label class="'+sel+'"><input type="radio" name="'+c.id+'" '+(cur===lv.v?'checked':'')+' data-cond="'+c.id+'" data-cond-v="'+lv.v+'" data-cond-l="'+esc(lv.l)+'"> '+esc(lv.l)+'</label>';
+      });
+      html += '</div></div>';
+    });
+    html += '</div></div>';
+  } else {
+    html += '<div class="q"><div class="qt"><span class="qn">Q'+(state.qIndex+1)+' / '+total+'</span>'+esc(qText(q))+'</div>';
+    if(q.type==='single'){
+      var cur = state.answers[q.id];
+      html += '<div class="opts">';
+      q.opts.forEach(function(o){
+        var sel = cur===o?' sel'+(isPar?' par':''):'';
+        html += '<label class="'+sel+'"><input type="radio" name="'+q.id+'" value="'+esc(o)+'" '+(cur===o?'checked':'')+' data-single="'+q.id+'" data-value="'+esc(o)+'"><span>'+esc(o)+termIcon(o)+'</span></label>';
+      });
+      html += '</div>';
+      if(q.other) html += '<div style="margin-top:8px;"><input type="text" placeholder="その他（自由記述）" data-text="'+q.id+'_other" value="'+esc(state.answers[q.id+'_other']||'')+'"></div>';
+    } else if(q.type==='multi'){
+      var curA = state.answers[q.id]||[];
+      html += '<div class="opts">';
+      q.opts.forEach(function(o){
+        var sel = curA.indexOf(o)>=0?' sel'+(isPar?' par':''):'';
+        html += '<label class="'+sel+'"><input type="checkbox" value="'+esc(o)+'" '+(curA.indexOf(o)>=0?'checked':'')+' data-multi="'+q.id+'" data-value="'+esc(o)+'"><span>'+esc(o)+termIcon(o)+'</span></label>';
+      });
+      html += '</div>';
+      if(q.other) html += '<div style="margin-top:8px;"><input type="text" placeholder="その他（自由記述）" data-text="'+q.id+'_other" value="'+esc(state.answers[q.id+'_other']||'')+'"></div>';
+    } else if(q.type==='text'){
+      var na = state.answers[q.id+'_noanswer'] === true;
+      html += '<textarea rows="4" placeholder="'+(q.noAnswer?'記入する場合はここに書いてください':'自由に記入してください')+'" data-text="'+q.id+'" '+(na?'disabled':'')+'>'+esc(na?'':(state.answers[q.id]||''))+'</textarea>';
+      if(q.noAnswer){
+        html += '<div class="priv gray"><input type="checkbox" id="na_'+q.id+'" '+(na?'checked':'')+' data-noans="'+q.id+'"><label for="na_'+q.id+'">特になし（回答しない）</label></div>';
+      }
+    }
+    if(state.role==='kid' && q.priv){
+      var hide = state.answers[q.id+'_hide']===true;
+      html += '<div class="priv"><input type="checkbox" id="priv_'+q.id+'" '+(hide?'checked':'')+' data-priv="'+q.id+'"><label for="priv_'+q.id+'">この回答を保護者に見せない</label></div>';
+    }
+    html += '</div>';
+  }
+  html += '<div class="footer-nav"><button data-nav="prev" '+(state.qIndex===0?'disabled':'')+'>← 戻る</button>'
+       + '<button class="'+(isPar?'par':'primary')+'" data-nav="next">'+(state.qIndex===total-1?'回答を完了する':'次へ →')+'</button></div>';
+  body.innerHTML = html;
+  bindQuizEvents();
+}
+function bindQuizEvents(){
+  var body = $('quiz-body');
+  body.querySelectorAll('[data-single]').forEach(function(el){
+    el.addEventListener('change', function(){ state.answers[this.getAttribute('data-single')] = this.getAttribute('data-value'); renderQuiz(); });
+  });
+  body.querySelectorAll('[data-multi]').forEach(function(el){
+    el.addEventListener('change', function(){
+      var id=this.getAttribute('data-multi'), v=this.getAttribute('data-value');
+      var arr = state.answers[id]||[];
+      if(this.checked){ if(arr.indexOf(v)<0) arr.push(v); } else { arr = arr.filter(function(x){return x!==v;}); }
+      state.answers[id]=arr; renderQuiz();
+    });
+  });
+  body.querySelectorAll('[data-text]').forEach(function(el){
+    el.addEventListener('input', function(){
+      state.answers[this.getAttribute('data-text')] = this.value;
+      if(this.value) state.answers[this.getAttribute('data-text')+'_noanswer'] = false;
+    });
+  });
+  body.querySelectorAll('[data-noans]').forEach(function(el){
+    el.addEventListener('change', function(){
+      var id = this.getAttribute('data-noans');
+      state.answers[id+'_noanswer'] = this.checked;
+      if(this.checked){ state.answers[id] = ''; }
+      renderQuiz();
+    });
+  });
+  body.querySelectorAll('[data-priv]').forEach(function(el){
+    el.addEventListener('change', function(){ state.answers[this.getAttribute('data-priv')+'_hide'] = this.checked; });
+  });
+  body.querySelectorAll('[data-cond]').forEach(function(el){
+    el.addEventListener('change', function(){
+      state.answers[this.getAttribute('data-cond')] = {
+        v: this.getAttribute('data-cond-v'),
+        l: this.getAttribute('data-cond-l')
+      };
+      renderQuiz();
+    });
+  });
+  body.querySelectorAll('[data-nav]').forEach(function(el){
+    el.addEventListener('click', function(){ if(this.getAttribute('data-nav')==='prev') prevQ(); else nextQ(); });
+  });
+  bindTermIcons();
+}
+function prevQ(){ if(state.qIndex>0){ state.qIndex--; renderQuiz(); } }
+function nextQ(){
+  var q = state.questions[state.qIndex];
+  if(q.type==='condblock'){
+    var missing = CONDITION_ITEMS.filter(function(c){ return !state.answers[c.id]; });
+    if(missing.length){ alert('すべての条件について選んでください。'); return; }
+  } else if(!q.optional && q.type!=='text'){
+    var v = state.answers[q.id];
+    var empty = v==null || (Array.isArray(v)&&v.length===0) || v==='';
+    if(empty && !(q.other && state.answers[q.id+'_other'])){ alert('この質問に回答してください。'); return; }
+  }
+  if(q.isCourse){
+    var idx = q.opts.indexOf(state.answers[q.id]);
+    state.course = COURSES[idx]?COURSES[idx].id:null;
+    state.questions = buildQuestions(state.course);
+  }
+  if(state.qIndex < state.questions.length-1){ state.qIndex++; renderQuiz(); }
+  else finishQuiz();
+}
+function finishQuiz(){
+  var store = loadStore();
+  store[state.code] = store[state.code]||{};
+  if(state.role==='kid'){
+    store[state.code].kid = true;
+    store[state.code].kidAnswers = state.answers;
+    store[state.code].course = state.course;
+    var hp = false;
+    for(var k in state.answers){
+      if(k.slice(-5)==='_hide' && state.answers[k] === true){ hp = true; break; }
+    }
+    store[state.code].kidHasPrivate = hp;
+  } else {
+    store[state.code].parent = true;
+    store[state.code].parentAnswers = state.answers;
+    if(!store[state.code].course) store[state.code].course = state.course;
+  }
+  saveStore(store);
+  showWait(state.role);
+}
+
+/* ===== 完了画面 ===== */
+function showWait(role){
+  show('screen-wait');
+  var store = loadStore(), d = store[state.code]||{};
+  var html = '';
+
+  if(role==='kid'){
+    var packed = cleanAnswersForSharing(d.kidAnswers||state.answers);
+    var shareCode = packData({ t:'k', k:packed.answers, hp:packed.hasPrivate, c:d.course||state.course });
+    state.lastShareCode = shareCode;
+    html = ''
+    + '<div class="role-switch kid">'
+    + '  <div class="big-icon">🧑</div>'
+    + '  <h2>子どもの回答が完了しました</h2>'
+    + '  <p>次のどちらかで、保護者の方へ進んでください。</p>'
+    + '</div>'
+    + (packed.hasPrivate ? '<div class="priv-notice">🔒 保護者に見せない設定の回答は、共有コードに含まれていません。</div>' : '')
+    + '<div class="card">'
+    + '  <h3>① 同じ端末で続けて回答する場合</h3>'
+    + '  <p class="note">この端末を保護者の方に渡してください。</p>'
+    + '  <div class="role-switch par" style="padding:20px;">'
+    + '    <div class="big-icon">👨‍👩‍👧</div>'
+    + '    <div class="who">次は【保護者】の方の回答です</div>'
+    + '    <button class="par" id="btn-same-device">保護者として回答を始める</button>'
+    + '  </div>'
+    + '</div>'
+    + '<div class="card">'
+    + '  <h3>② 別の端末で回答する場合（共有コード）</h3>'
+    + '  <p class="note">下の共有コードをコピーして保護者に送ってください。</p>'
+    + '  <div class="sharebox">'
+    + '    <textarea id="share-code-area" rows="6" readonly>'+esc(shareCode)+'</textarea>'
+    + '    <div class="row">'
+    + '      <button class="primary" id="btn-copy-share">📋 コピーする</button>'
+    + '      <button id="btn-copy-url">🔗 URLでコピー</button>'
+    + '    </div>'
+    + '    <div id="copy-msg" class="note" style="margin-top:6px;color:#059669;"></div>'
+    + '  </div>'
+    + '</div>'
+    + '<div class="footer-nav"><button onclick="goHome()">最初に戻る</button></div>';
+  } else {
+    var kidPacked = cleanAnswersForSharing(d.kidAnswers||{});
+    var parPacked = cleanAnswersForSharing(d.parentAnswers||state.answers);
+    var resultCode = packData({
+      t:'r',
+      k: kidPacked.answers, hp: kidPacked.hasPrivate,
+      p: parPacked.answers,
+      c: d.course||state.course
+    });
+    state.lastShareCode = resultCode;
+    html = ''
+    + '<div class="role-switch par">'
+    + '  <div class="big-icon">👨‍👩‍👧</div>'
+    + '  <h2>保護者の回答が完了しました</h2>'
+    + '  <p>両方の回答がそろいました。</p>'
+    + '</div>'
+    + '<div class="card">'
+    + '  <h3>📊 結果を表示する</h3>'
+    + '  <div class="footer-nav">'
+    + '    <button onclick="goHome()">最初に戻る</button>'
+    + '    <button class="par" id="btn-check-both">結果を表示する</button>'
+    + '  </div>'
+    + '</div>'
+    + '<div class="card">'
+    + '  <h3>📤 結果共有コード（子どもに送ると、子どもも結果を見られます）</h3>'
+    + '  <div class="sharebox">'
+    + '    <textarea id="share-code-area" rows="6" readonly>'+esc(resultCode)+'</textarea>'
+    + '    <div class="row">'
+    + '      <button class="par" id="btn-copy-share">📋 コピーする</button>'
+    + '      <button id="btn-copy-url">🔗 URLでコピー</button>'
+    + '    </div>'
+    + '    <div id="copy-msg" class="note" style="margin-top:6px;color:#059669;"></div>'
+    + '  </div>'
+    + '</div>';
+  }
+  $('screen-wait').innerHTML = html;
+  if(role==='kid') $('btn-same-device').addEventListener('click', startParentSameDevice);
+  else $('btn-check-both').addEventListener('click', checkBothReady);
+  $('btn-copy-share').addEventListener('click', copyShareCode);
+  $('btn-copy-url').addEventListener('click', copyShareUrl);
+}
+function startParentSameDevice(){
+  var store = loadStore();
+  var d = store[state.code]||{};
+  if(!d.kid){ alert('先に子どもの回答を完了してください。'); return; }
+  state.role = 'parent';
+  state.answers = {};
+  state.qIndex = 0;
+  beginQuestions('parent');
+}
+function checkBothReady(){
+  var store = loadStore(), d = store[state.code]||{};
+  if(d.kid && d.parent){ showResult(state.code); }
+  else { alert('まだ両方の回答がそろっていません。'); }
+}
+
+/* ===== 結果 ===== */
+function textOrNa(ans, noans){
+  if(noans === true) return '特になし';
+  return ans;
+}
+function showResult(code){
+  var store = loadStore(), d = store[code];
+  if(!d){ alert('結果が見つかりません。'); return; }
+  var kid = d.kidAnswers||{}, par = d.parentAnswers||{};
+  var kidHasPrivate = d.kidHasPrivate || false;
+  if(!kidHasPrivate) kidHasPrivate = detectHasPrivate(kid);
+
+  var course = d.course||'undecided';
+  var courseLabel = (COURSES.filter(function(c){return c.id===course;})[0]||{}).label||'未定';
+  var analysis = analyze(kid, par, course);
+  var schools = suggestSchools(kid, par, course);
+
+  var kidBlocks = '';
+  kidBlocks += '<p><strong>興味：</strong>'+list(kid.c_interest, kid.c_interest_other)+'</p>';
+  kidBlocks += '<p><strong>得意：</strong>'+list(kid.c_strength, kid.c_strength_other)+'</p>';
+  kidBlocks += '<p><strong>大切にしたいこと：</strong>'+list(kid.c_value, kid.c_value_other)+'</p>';
+  if(kid.c_overseas && kid.c_overseas.length) kidBlocks += '<p><strong>海外の希望：</strong>'+list(kid.c_overseas, kid.c_overseas_other)+'</p>';
+  kidBlocks += '<p><strong>学び方：</strong>'+esc(kid.c_style||'—')+'</p>';
+  kidBlocks += '<p><strong>将来の気持ち：</strong>'+esc(kid.c_future||'—')+'</p>';
+  kidBlocks += '<p><strong>通学：</strong>'+esc(kid.c_place||'—')+'</p>';
+  if(kid.c_gender_pref) kidBlocks += '<p><strong>共学・別学の希望：</strong>'+esc(kid.c_gender_pref)+'</p>';
+  if(kid.c_level_pref) kidBlocks += '<p><strong>学力帯の希望：</strong>'+esc(kid.c_level_pref)+'</p>';
+  if(!kid.c_worry_hide){
+    var kw = textOrNa(kid.c_worry, kid.c_worry_noanswer);
+    if(kw) kidBlocks += '<p><strong>気になっていること：</strong>'+esc(kw)+'</p>';
+  }
+  if(!kid.c_dream_hide){
+    var kd = textOrNa(kid.c_dream, kid.c_dream_noanswer);
+    if(kd) kidBlocks += '<p><strong>本当はやってみたいこと：</strong>'+esc(kd)+'</p>';
+  }
+  if(!kid.c_free_hide){
+    var kf = textOrNa(kid.c_free, kid.c_free_noanswer);
+    if(kf) kidBlocks += '<p><strong>その他：</strong>'+esc(kf)+'</p>';
+  }
+
+  /* 保護者の回答表示：共通質問の回答を使用 */
+  var parWorryText = textOrNa(par.p_worry, par.p_worry_noanswer) || '（未記入）';
+  var parChildStrText = textOrNa(par.p_child_str, par.p_child_str_noanswer) || '（未記入）';
+
+  var html = ''
+  + '<div class="card"><h2>📊 親子の進路 統合結果</h2>'
+  + '<p class="lead">探している進路：<strong>'+esc(courseLabel)+'</strong></p>'
+  + '<p class="note">この結果は優劣を決めるものではありません。話し合いの材料として使ってください。</p></div>'
+
+  + '<div class="card"><h3>🧒 子どもの考え</h3>'+kidBlocks
+  + (kidHasPrivate ? '<div class="priv-notice">🔒 子どもが非公開に設定した回答があります（内容は表示されません）。</div>' : '')
+  + '</div>'
+
+  + '<div class="card"><h3>👨‍👩‍👧 保護者の考え</h3>'
+  + '<p><strong>関心を持っていそうな分野：</strong>'+list(par.c_interest, par.c_interest_other)+'</p>'
+  + '<p><strong>得意・強みだと感じること：</strong>'+list(par.c_strength, par.c_strength_other)+'</p>'
+  + '<p><strong>大切にしてほしいこと：</strong>'+list(par.c_value, par.c_value_other)+'</p>'
+  + (par.c_overseas && par.c_overseas.length ? '<p><strong>海外経験の希望：</strong>'+list(par.c_overseas, par.c_overseas_other)+'</p>' : '')
+  + '<p><strong>通学について：</strong>'+esc(par.c_place||'—')+'</p>'
+  + '<p><strong>共学・別学の希望：</strong>'+esc(par.c_gender_pref||'—')+'</p>'
+  + '<p><strong>学力帯の希望：</strong>'+esc(par.c_level_pref||'—')+'</p>'
+  + '<p><strong>子どもの良いところ：</strong>'+esc(parChildStrText)+'</p>'
+  + '<p><strong>心配していること：</strong>'+esc(parWorryText)+'</p>'
+  + '<p><strong>費用：</strong>'+esc(par.p_cost||'—')+'</p>'
+  + (function(){
+      var f = textOrNa(par.c_free, par.c_free_noanswer);
+      return f ? '<p><strong>その他：</strong>'+esc(f)+'</p>' : '';
+    })()
+  + '</div>'
+
+  + '<div class="card"><h3>🔍 親子比較</h3>'
+  + '<h4>共通していること</h4>'
+  + (analysis.agree.length? analysis.agree.map(function(a){return '<div class="agree">'+esc(a)+'</div>';}).join('') : '<p class="note">今回は共通点が少なめです。だからこそ話し合いの余地があります。</p>')
+  + '<h4>考え方が違うところ</h4>'
+  + (analysis.diff.length? analysis.diff.map(function(a){return '<div class="diff">'+esc(a)+'</div>';}).join('') : '<p class="note">大きな違いは見つかりませんでした。</p>')
+  + '<h4>重視している条件の違い</h4>'
+  + '<table><tr><th>条件</th><th>子ども</th><th>保護者</th></tr>'
+  + CONDITION_ITEMS.map(function(c){
+      return '<tr><td>'+esc(c.label)+'</td><td>'+esc(condLabel(kid[c.id])||'—')+'</td><td>'+esc(condLabel(par[c.id])||'—')+'</td></tr>';
+    }).join('')
+  + '</table></div>'
+
+  + '<div class="card"><h3>💬 話し合いのヒント</h3>'
+  + '<div class="talk">子どもから：<br>「私は <strong>'+esc((kid.c_value||[]).join('・')||'（未選択）')+'</strong> を大切にして進路を考えたい。」</div>'
+  + '<div class="talk">保護者から：<br>'
+  + '「私は <strong>'+esc((par.c_value||[]).join('・')||'（未選択）')+'</strong> を大切にしてほしい。'
+  + (par.p_worry_noanswer ? '心配事は特にありません。」' : ('一方で <strong>'+esc(par.p_worry||'（未記入）')+'</strong> について心配している。」'))
+  + '</div>'
+  + '<h4>話し合ってみるテーマ</h4>'
+  + (analysis.themes.length? analysis.themes.map(function(t){
+      return '<div class="theme"><h5>💡 '+esc(t.title)+'</h5><p>'+esc(t.detail)+'</p></div>';
+    }).join('') : '<p class="note">今回は特にテーマはありません。お互いの回答を読み合ってみてください。</p>')
+  + '</div>'
+
+  + '<div class="card"><h3>🗺 進路マップ（分岐型）</h3>'
+  + renderBranchingMap(analysis, kid, par, course, schools)
+  + '</div>'
+
+  + '<div class="card"><h3>🏫 進路候補（3つ）</h3>'
+  + '<p class="note">単純なランキングではありません。3校それぞれに役割があります。</p>'
+  + schools.map(function(s){
+      var cls = s.role==='最有力'?'role-main':(s.role==='別の方向性'?'role-alt':'role-comp');
+      var lbl = s.role==='最有力'?'main':(s.role==='別の方向性'?'alt':'comp');
+      return '<div class="school '+cls+'">'
+        + '<span class="role-label '+lbl+'">'+esc(s.role)+'</span>'
+        + '<h4>'+esc(s.name)+'</h4>'
+        + '<span class="tag">'+esc(s.type)+'</span><span class="tag">'+esc(s.area)+'</span>'
+        + '<span class="tag">'+esc(s.gender)+'</span><span class="tag">学力帯：'+esc(s.level)+'</span>'
+        + '<span class="tag">学費：'+esc(s.cost)+'</span><span class="tag">通学：'+esc(s.dist)+'</span>'
+        + (s.intl?'<span class="tag">国際教育</span>':'')+(s.club?'<span class="tag">部活動</span>':'')
+        + '<div class="reasons-block">'
+        + (s.kidReason?'<div class="row"><span class="side k">子ども</span>'+esc(s.kidReason)+'</div>':'')
+        + (s.parReason?'<div class="row"><span class="side p">保護者</span>'+esc(s.parReason)+'</div>':'')
+        + '<div class="row"><span class="side s">学校</span>'+esc(s.schoolReason)+'</div>'
+        + (s.matched && s.matched.length ? '<div class="row"><span class="side">一致</span>'
+            + '<ul class="matched-list">'+ s.matched.map(function(m){return '<li>'+esc(m)+'</li>';}).join('') +'</ul></div>' : '')
+        + '</div>'
+        + '<p style="margin:4px 0;"><strong>特徴：</strong>'+esc(s.note)+'</p>'
+        + '<p style="margin:4px 0;"><strong>違いのポイント：</strong>'+esc(s.diff)+'</p>'
+        + (s.source ? '<p class="meta-line">情報源：'+esc(s.source)+(s.updatedAt?(' ／ 更新：'+esc(s.updatedAt)):'')+'</p>' : '')
+        + '</div>';
+    }).join('')
+  + '<p class="note">※ 学校情報は概要です。最新情報は各校の公式サイトでご確認ください。</p></div>'
+
+  + '<div class="card"><button id="btn-back-home">最初に戻る</button> <button id="btn-print">印刷する</button></div>';
+
+  $('screen-result').innerHTML = html;
+  show('screen-result');
+  $('btn-back-home').addEventListener('click', goHome);
+  $('btn-print').addEventListener('click', function(){ window.print(); });
+  bindTermIcons();
+}
+function list(arr, other){
+  var s = (arr||[]).join('・');
+  if(other) s += (s?'・':'')+other;
+  return s?esc(s):'（未選択）';
+}
+
+/* ===== 分析 ===== */
+function analyze(kid, par, course){
+  var agree=[], diff=[], themes=[];
+  /* 保護者は共通質問の c_interest / c_value を使う */
+  var kInt = kid.c_interest||[], pInt = par.c_interest||[];
+  var commonInt = kInt.filter(function(x){ return pInt.indexOf(x)>=0; });
+  if(commonInt.length) agree.push('興味・適性の方向性が一致：'+commonInt.join('・'));
+  var onlyKid = kInt.filter(function(x){ return pInt.indexOf(x)<0 && x!=='まだ分からない'; });
+  var onlyPar = pInt.filter(function(x){ return kInt.indexOf(x)<0 && x!=='まだ分からない'; });
+  if(onlyKid.length) diff.push('子どもが興味を持っているが、保護者の想定になかった分野：'+onlyKid.join('・'));
+  if(onlyPar.length) diff.push('保護者が合いそうと思っているが、子どもが選ばなかった分野：'+onlyPar.join('・'));
+
+  var kVal = kid.c_value||[], pVal = par.c_value||[];
+  var commonVal = kVal.filter(function(x){ return pVal.indexOf(x)>=0; });
+  if(commonVal.length) agree.push('大切にしたいことの一致：'+commonVal.join('・'));
+  var allVal = kVal.concat(pVal).filter(function(x,i,arr){ return arr.indexOf(x)===i; });
+  var valDiff = allVal.filter(function(x){ return !(kVal.indexOf(x)>=0 && pVal.indexOf(x)>=0); });
+  if(valDiff.length) diff.push('価値観の違いが見える項目：'+valDiff.join('・'));
+
+  CONDITION_ITEMS.forEach(function(c){
+    var kv = condValue(kid[c.id]), pv = condValue(par[c.id]);
+    if(kv && pv && kv!==pv && (kv==='must'||pv==='must')){
+      diff.push('「'+c.label+'」で条件の強さが違う（子ども：'+condLabel(kid[c.id])+'／保護者：'+condLabel(par[c.id])+'）');
+    }
+  });
+
+  var kOvs = (kid.c_overseas||[]).filter(function(x){return x!=='興味なし';});
+  var pOvs = (par.c_overseas||[]).filter(function(x){return x!=='興味なし';});
+  var ovsCommon = kOvs.filter(function(x){ return pOvs.indexOf(x)>=0; });
+  if(ovsCommon.length) agree.push('海外経験の希望が一致：'+ovsCommon.join('・'));
+  var ovsOnlyKid = kOvs.filter(function(x){ return pOvs.indexOf(x)<0; });
+  var ovsOnlyPar = pOvs.filter(function(x){ return kOvs.indexOf(x)<0; });
+  if(ovsOnlyKid.length) diff.push('子どもが希望する海外経験：'+ovsOnlyKid.join('・'));
+  if(ovsOnlyPar.length) diff.push('保護者が希望する海外経験：'+ovsOnlyPar.join('・'));
+  if(kOvs.length && !pOvs.length){
+    themes.push({
+      title:'子どもの海外希望について、保護者はどう考えるか',
+      detail:'海外経験は費用・安全面なども関わります。希望の背景を聞いてみましょう。'
+    });
+  }
+
+  if(onlyKid.length && onlyPar.length){
+    onlyKid.forEach(function(k){
+      onlyPar.forEach(function(p){
+        themes.push({
+          title: '「'+k+'」（子ども）と「'+p+'」（保護者）を両立できる進路は？',
+          detail: '例えば'+k+'を学びながら'+p+'にもつながる学部・学科・コースがあります。両方を少しずつ含む進路を探してみましょう。'
+        });
+      });
+    });
+  }
+  if(onlyKid.length && !onlyPar.length){
+    onlyKid.forEach(function(k){
+      themes.push({
+        title: '子どもの「'+k+'」への興味を、保護者はどう受け止めるか',
+        detail: '保護者の想定になかった分野だからこそ、子どもがどんなきっかけで興味を持ったのか聞いてみましょう。'
+      });
+    });
+  }
+  if(onlyPar.length && !onlyKid.length){
+    onlyPar.forEach(function(p){
+      themes.push({
+        title: '保護者が考える「'+p+'」の適性について、子どもはどう感じるか',
+        detail: '保護者から見た子どもの姿と、子ども自身の実感が一致しているか確認してみましょう。'
+      });
+    });
+  }
+  var mustKid = CONDITION_ITEMS.filter(function(c){return condValue(kid[c.id])==='must';}).map(function(c){return c.label;});
+  var mustPar = CONDITION_ITEMS.filter(function(c){return condValue(par[c.id])==='must';}).map(function(c){return c.label;});
+  var mustDiff = mustKid.filter(function(k){ return mustPar.indexOf(k)<0; }).concat(mustPar.filter(function(p){ return mustKid.indexOf(p)<0; }));
+  if(mustDiff.length){
+    themes.push({
+      title: '「絶対条件」が親子でずれている項目：'+mustDiff.join('・'),
+      detail: 'どちらを優先するか、または両方を満たす学校があるかを一緒に調べてみましょう。'
+    });
+  }
+  if(course==='undecided'){
+    themes.push({
+      title: 'まだ決まっていないことを前提に、興味を広げる体験から',
+      detail: 'オープンキャンパスや職業体験など、実際に触れてみる機会を一緒に探してみましょう。'
+    });
+  }
+
+  return {agree:agree, diff:diff, themes:themes, commonInt:commonInt, onlyKid:onlyKid, onlyPar:onlyPar};
+}
+
+/* ===== 分岐型マップ ===== */
+function renderBranchingMap(analysis, kid, par, course, schools){
+  var interests = analysis.commonInt.length ? analysis.commonInt : (kid.c_interest||[]).slice(0,4);
+  interests = interests.filter(function(i){ return i!=='まだ分からない'; });
+  if(!interests.length) interests = ['（興味が選ばれていません）'];
+
+  var schoolNames = (schools||[]).map(function(s){ return s.name; });
+  var schoolFallback = (function(){
+    var t = {jhs:'中学校', hs:'高校', univ:'大学', voc:'専門学校・短大'}[course];
+    return t ? [t+'の候補は、上の「進路候補」をご覧ください'] : ['進路候補は上の「進路候補」をご覧ください'];
+  })();
+
+  var html = '<div class="map-intro">'
+    + 'この図は、あなた（たち）の興味から、<strong>どの学問分野・職業・学校につながるか</strong>を示したものです。'
+    + '1つの興味から複数の道があります。1本に絞る必要はありません。</div>';
+
+  interests.forEach(function(interest){
+    var branches = BRANCH_MAP[interest];
+    html += '<div class="branch-group">';
+    html += '<div class="branch-root"><span class="map-chip">'+esc(interest)+'</span><span class="lbl">から広がる道</span></div>';
+    if(!branches || !branches.length){
+      html += '<div class="branch-line"><span class="branch-connector">└→</span><span class="map-chip gray">（学問分野の情報が未登録です）</span></div>';
+    } else {
+      branches.forEach(function(b, i){
+        var connector = (i === branches.length-1) ? '└→' : '├→';
+        html += '<div class="branch-line">'
+          + '<span class="branch-connector">'+connector+'</span>'
+          + '<span class="map-chip par">'+esc(b.field)+'</span>'
+          + '<span class="branch-arrow">→</span>'
+          + b.jobs.map(function(j){return '<span class="map-chip acc">'+esc(j)+'</span>';}).join('')
+          + '</div>';
+        html += '<div class="branch-line" style="padding-left:44px;">'
+          + '<span class="branch-arrow">└学校</span> '
+          + (schoolNames.length
+              ? schoolNames.map(function(n){return '<span class="map-chip gray">'+esc(n)+'</span>';}).join('')
+              : schoolFallback.map(function(n){return '<span class="map-chip gray">'+esc(n)+'</span>';}).join(''))
+          + '</div>';
+      });
+    }
+    html += '</div>';
+  });
+
+  var kOvs = (kid.c_overseas||[]).filter(function(x){return x!=='興味なし';});
+  var pOvs = (par.c_overseas||[]).filter(function(x){return x!=='興味なし';});
+  var ovsAll = kOvs.concat(pOvs).filter(function(x,i,arr){ return x && arr.indexOf(x)===i; });
+  if(ovsAll.length){
+    html += '<div class="branch-group overseas">';
+    html += '<div class="branch-root"><span class="map-chip ovs">🌏 海外の道</span><span class="lbl">あなた（たち）が選んだ海外の希望</span></div>';
+    html += '<div class="branch-line" style="padding-left:8px;">'
+      + '<span class="branch-arrow">希望：</span> '
+      + ovsAll.map(function(x){return '<span class="map-chip ovs">'+esc(x)+'</span>';}).join('')
+      + '</div>';
+    OVERSEAS_BRANCH.forEach(function(b, i){
+      var connector = (i === OVERSEAS_BRANCH.length-1) ? '└→' : '├→';
+      html += '<div class="branch-line">'
+        + '<span class="branch-connector">'+connector+'</span>'
+        + '<span class="map-chip par">'+esc(b.field)+'</span>'
+        + '<span class="branch-arrow">→</span>'
+        + b.jobs.map(function(j){return '<span class="map-chip acc">'+esc(j)+'</span>';}).join('')
+        + '</div>';
+    });
+    html += '<p class="note" style="margin:8px 0 0;font-size:12px;">※ 海外進学は費用・ビザ・語学力なども関わります。詳しくは各校・留学エージェントにご相談ください。</p>';
+    html += '</div>';
+  }
+
+  html += '<p class="note" style="margin-top:12px;">※ あくまで一例です。同じ興味から、ここに挙げた以外の道も広がります。</p>';
+  return html;
+}
+
+/* ===== 学校推薦 ===== */
+function suggestSchools(kid, par, course){
+  var typeMap = {jhs:'中学', hs:'高校', univ:'大学', voc:'専門', undecided:null};
+  var wantType = typeMap[course];
+  var pool = SCHOOLS.filter(function(s){ return !wantType || s.type===wantType; });
+  if(!pool.length) pool = SCHOOLS.slice();
+
+  var genderPrefs = [kid.c_gender_pref, par.c_gender_pref].filter(function(p){
+    return p && p.indexOf('こだわらない') < 0;
+  });
+  var levelPrefs = [kid.c_level_pref, par.c_level_pref].filter(function(p){
+    return p && p !== 'こだわらない';
+  });
+  var genderStrict = (condValue(kid.cond_gender) === 'must' || condValue(par.cond_gender) === 'must');
+  var levelStrict = (condValue(kid.cond_level) === 'must' || condValue(par.cond_level) === 'must');
+
+  var GENDER_MATCH = { '共学がいい':'共学', '男子校がいい':'男子', '女子校がいい':'女子' };
+  var LEVEL_MATCH = {
+    '上位校を狙いたい': ['最上位','上位','中堅上位'],
+    '中堅上位くらい': ['上位','中堅上位','中堅'],
+    '中堅くらい': ['中堅上位','中堅']
+  };
+
+  function isAvoid(condId){
+    return condValue(kid[condId]) === 'avoid' || condValue(par[condId]) === 'avoid';
+  }
+  var avoidDistance = isAvoid('cond_distance');
+  var avoidCost = isAvoid('cond_cost');
+  var avoidLevel = isAvoid('cond_level');
+  var avoidGender = isAvoid('cond_gender');
+  var avoidClub = isAvoid('cond_club');
+  var avoidIntl = isAvoid('cond_intl');
+
+  var filtered = pool.filter(function(s){
+    if(genderStrict && genderPrefs.length){
+      var ok = genderPrefs.some(function(p){ var w = GENDER_MATCH[p]; return w && s.gender === w; });
+      if(!ok) return false;
+    }
+    if(levelStrict && levelPrefs.length){
+      var ok2 = levelPrefs.some(function(p){ var allowed = LEVEL_MATCH[p] || []; return allowed.indexOf(s.level) >= 0; });
+      if(!ok2) return false;
+    }
+    return true;
+  });
+  if(filtered.length) pool = filtered;
+
+  var kInt = (kid.c_interest||[]).concat(kid.u_field||[], kid.v_field||[]).filter(function(x){return x!=='まだ分からない';});
+  var pInt = par.c_interest||[];
+  var kOvs = (kid.c_overseas||[]).filter(function(x){return x!=='興味なし';});
+  var pOvs = (par.c_overseas||[]).filter(function(x){return x!=='興味なし';});
+
+  function featuresForInterest(interest){
+    return INTEREST_TO_FEATURES[interest] || [interest];
+  }
+  function featuresForCourseQ(qid, val){
+    var map = COURSE_Q_TO_FEATURES[qid];
+    if(!map || !val) return [];
+    return map[val] || [];
+  }
+  function featuresForOverseas(opt){
+    return OVERSEAS_TO_FEATURES[opt] || [];
+  }
+  function matchFeature(school, feat){
+    var hay = (school.fields||[]).concat([school.note||'']);
+    return hay.some(function(f){ return f.indexOf(feat)>=0 || feat.indexOf(f)>=0; });
+  }
+
+  pool.forEach(function(s){
+    var score = 0;
+    var kidHit = [], parHit = [], matched = [];
+
+    kInt.forEach(function(f){
+      var feats = featuresForInterest(f);
+      var hit = feats.some(function(feat){ return matchFeature(s, feat); });
+      if(hit){ score+=3; kidHit.push(f); }
+    });
+    pInt.forEach(function(f){
+      var feats = featuresForInterest(f);
+      var hit = feats.some(function(feat){ return matchFeature(s, feat); });
+      if(hit){ score+=2; parHit.push(f); }
+    });
+
+    var courseQ_used = [];
+    Object.keys(COURSE_Q_TO_FEATURES).forEach(function(qid){
+      var val = kid[qid];
+      var valArr = Array.isArray(val) ? val : (val? [val] : []);
+      valArr.forEach(function(v){
+        var feats = featuresForCourseQ(qid, v);
+        var hit = feats.length && feats.some(function(feat){ return matchFeature(s, feat); });
+        if(hit){ score += 2; courseQ_used.push(v); }
+      });
+    });
+
+    var overseasHit = [];
+    kOvs.concat(pOvs).forEach(function(o){
+      var feats = featuresForOverseas(o);
+      var hit = feats.length && feats.some(function(feat){ return matchFeature(s, feat); });
+      if(hit){ score += 3; overseasHit.push(o); }
+    });
+
+    if((kid.c_place==='自宅から通いたい'||par.c_place==='自宅から通いたい') && s.dist && s.dist.indexOf('分')>=0){
+      var m = s.dist.match(/(\d+)分/);
+      if(m && parseInt(m[1])<=40){ score+=2; matched.push('通学時間が比較的短い'); }
+    }
+    if(par.p_cost==='国公立中心' && s.cost==='低'){ score+=2; matched.push('学費が低め'); }
+
+    if(!genderStrict && genderPrefs.length){
+      genderPrefs.forEach(function(p){
+        var want = GENDER_MATCH[p];
+        if(want && s.gender === want){ score += 2; matched.push(p+'と一致'); }
+      });
+    }
+    if(!levelStrict && levelPrefs.length){
+      levelPrefs.forEach(function(p){
+        var allowed = LEVEL_MATCH[p] || [];
+        if(allowed.indexOf(s.level) >= 0){ score += 2; matched.push('学力帯：'+p+'と一致'); }
+      });
+    }
+
+    CONDITION_ITEMS.forEach(function(c){
+      var kv=condValue(kid[c.id]), pv=condValue(par[c.id]);
+      var strong = (kv==='must'||pv==='must');
+      var soft = (kv==='want'||pv==='want');
+      var avoid = (kv==='avoid'||pv==='avoid');
+      if(c.id==='cond_intl'){
+        if(strong && s.intl){ score+=3; matched.push('国際教育が必須条件を満たす'); }
+        if(soft && s.intl){ score+=1; matched.push('国際教育の希望を満たす'); }
+        if(avoid && s.intl){ score-=4; }
+      }
+      if(c.id==='cond_club'){
+        if(strong && s.club){ score+=2; matched.push('部活動が必須条件を満たす'); }
+        if(soft && s.club){ score+=1; }
+        if(avoid && s.club){ score-=3; }
+      }
+      if(c.id==='cond_cost'){
+        if(strong && s.cost==='低'){ score+=3; matched.push('学費が必須条件を満たす'); }
+        if(soft && s.cost==='低'){ score+=1; }
+        if(avoid && s.cost==='高'){ score-=4; }
+      }
+      if(c.id==='cond_distance'){
+        if(s.dist && s.dist.indexOf('分')>=0){
+          var m2 = s.dist.match(/(\d+)分/);
+          var mins = m2 ? parseInt(m2[1]) : 60;
+          if(strong && mins<=30){ score+=3; matched.push('通学時間が必須条件を満たす'); }
+          if(soft && mins<=60){ score+=1; }
+          if(avoid && mins>60){ score-=4; }
+        }
+      }
+      if(c.id==='cond_level'){
+        var goodLevel = (s.level==='上位'||s.level==='最上位'||s.level==='中堅上位'||s.level==='中堅');
+        var highLevel = (s.level==='最上位'||s.level==='上位');
+        if(strong && goodLevel){ score+=2; matched.push('学力帯が必須条件を満たす'); }
+        if(soft && goodLevel){ score+=1; }
+        if(avoid && highLevel){ score-=3; }
+      }
+      if(c.id==='cond_gender'){
+        if(strong && s.gender==='共学'){ score+=1; }
+        if(avoid && s.gender!=='共学'){ score-=3; }
+      }
+    });
+
+    s._score = score;
+    s._kidHit = kidHit;
+    s._parHit = parHit;
+    s._courseHit = courseQ_used;
+    s._overseasHit = overseasHit;
+    s._matched = matched;
+  });
+  pool.sort(function(x,y){ return y._score-x._score; });
+
+  var chosen = [];
+  var usedNames = {};
+  function pushIfNew(s, role){
+    if(!s || usedNames[s.name]) return false;
+    usedNames[s.name] = true;
+    chosen.push({school: s, role: role});
+    return true;
+  }
+
+  if(pool.length) pushIfNew(pool[0], '最有力');
+  if(chosen.length){
+    var topFields = chosen[0].school.fields || [];
+    for(var i=1;i<pool.length;i++){
+      var s = pool[i];
+      var sFields = s.fields || [];
+      var hasUnique = sFields.some(function(f){ return topFields.indexOf(f) < 0; });
+      if(hasUnique){ if(pushIfNew(s, '別の方向性')) break; }
+    }
+  }
+  if(chosen.length<3){
+    for(var j=0;j<pool.length;j++){
+      var cand = pool[j];
+      if(usedNames[cand.name]) continue;
+      var isDiff = chosen.some(function(c){
+        return c.school.cost !== cand.cost || c.school.area !== cand.area;
+      });
+      if(isDiff){ if(pushIfNew(cand, '比較対象')) break; }
+    }
+  }
+  for(var k=0;k<pool.length && chosen.length<3;k++){
+    pushIfNew(pool[k], '比較対象');
+  }
+
+  return chosen.slice(0,3).map(function(item){
+    var s = item.school;
+    var kidReason = s._kidHit && s._kidHit.length
+      ? '興味「'+s._kidHit.join('・')+'」が学校の特徴と重なります'
+      : '';
+    var parReason = s._parHit && s._parHit.length
+      ? '適性「'+s._parHit.join('・')+'」が学校の特徴と重なります'
+      : '';
+    var schoolReason = (function(){
+      var fs = (s.fields||[]).join('・');
+      var extras = [];
+      if(s.intl) extras.push('国際教育あり');
+      if(s.club) extras.push('部活動あり');
+      if(s.cost==='低') extras.push('学費が低め');
+      return (fs?('学べる内容：'+fs+'。'):'') + (extras.length?('特徴：'+extras.join('、')):'');
+    })();
+    var diff = '学費：'+s.cost+'／通学：'+s.dist+'／'+(s.intl?'国際教育あり':'国際教育なし')+'／'+(s.club?'部活動あり':'部活動なし');
+    var matched = (s._matched || []).slice();
+    if(s._courseHit && s._courseHit.length){
+      matched.push('進路別の希望（'+s._courseHit.join('・')+'）が学校の特徴と重なる');
+    }
+    if(s._overseasHit && s._overseasHit.length){
+      matched.push('海外の希望（'+s._overseasHit.join('・')+'）と関連');
+    }
+    return Object.assign({}, s, {
+      role: item.role,
+      kidReason: kidReason,
+      parReason: parReason,
+      schoolReason: schoolReason,
+      matched: matched,
+      diff: diff
+    });
+  });
+}
+
+/* ===== コピー ===== */
+function copyToClipboard(text, msgEl){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){
+      if(msgEl) msgEl.textContent = '✅ コピーしました';
+    }, function(){ fallbackCopy(text, msgEl); });
+  } else { fallbackCopy(text, msgEl); }
+}
+function fallbackCopy(text, msgEl){
+  var ta = $('share-code-area');
+  if(!ta) return;
+  ta.removeAttribute('readonly');
+  ta.select();
+  try{ document.execCommand('copy'); if(msgEl) msgEl.textContent = '✅ コピーしました'; }
+  catch(e){ if(msgEl) msgEl.textContent = 'コピーできませんでした。手動で選択してください。'; }
+  ta.setAttribute('readonly','readonly');
+}
+function copyShareCode(){
+  var ta = $('share-code-area');
+  if(!ta) return;
+  copyToClipboard(ta.value, $('copy-msg'));
+}
+function copyShareUrl(){
+  var ta = $('share-code-area');
+  if(!ta) return;
+  var base = location.href.split('#')[0];
+  var url = base + '#share=' + encodeURIComponent(ta.value);
+  copyToClipboard(url, $('copy-msg'));
+}
+function checkUrlHash(){
+  var hash = location.hash||'';
+  if(hash.indexOf('#share=')===0){
+    var code = decodeURIComponent(hash.substring(7));
+    $('par-share-input').value = code;
+    state.role = 'parent';
+    show('screen-par-code');
+    if(history.replaceState) history.replaceState(null,'',location.pathname+location.search);
+  }
+}
+
+/* ===== 初期化 ===== */
+function init(){
+  $('js-ok').style.display='block';
+  $('btn-kid').addEventListener('click', startKid);
+  $('btn-par').addEventListener('click', showParentCode);
+  $('btn-view').addEventListener('click', showView);
+  $('btn-kid-back').addEventListener('click', goHome);
+  $('btn-kid-start').addEventListener('click', function(){ beginQuestions('kid'); });
+  $('btn-par-back').addEventListener('click', goHome);
+  $('btn-par-next').addEventListener('click', checkParCode);
+  $('btn-view-back').addEventListener('click', goHome);
+  $('btn-view-next').addEventListener('click', checkViewCode);
+  $('btn-home').addEventListener('click', goHome);
+  $('btn-manage-data').addEventListener('click', showManage);
+  $('btn-manage-back').addEventListener('click', goHome);
+  $('btn-import-text').addEventListener('click', importText);
+  $('btn-load-file').addEventListener('click', loadFile);
+  $('file-input').addEventListener('change', onFileSelected);
+  $('btn-export-csv').addEventListener('click', downloadCSV);
+  $('btn-copy-csv').addEventListener('click', copyCSV);
+  $('btn-reset-data').addEventListener('click', resetSchools);
+  renderSaved();
+  checkUrlHash();
+}
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
